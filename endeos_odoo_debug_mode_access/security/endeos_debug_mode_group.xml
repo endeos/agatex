@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<odoo>
+
+    <record id="module_endeos_debug_mode_access_category" model="ir.module.category">
+        <field name="name">Modo desarrollador</field>
+    </record>
+
+    <!-- Restricted user group -->
+    <record id="endeos_debug_mode_access_group" model="res.groups">
+        <field name="name">Puede habilitar</field>
+        <field name="comment">Permite habilitar el modo desarrollador de Odoo</field>
+        <field name="category_id" ref="module_endeos_debug_mode_access_category" />
+    </record>
+
+
+</odoo>
