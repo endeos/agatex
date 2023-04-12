@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+    <template id="user_detail_report">
+        <t t-set="company" t-value="env.company"/>
+        <t t-call="web.html_container">
+        <t t-call="web.internal_layout">
+            <t t-foreach="docs" t-as="o">
+            <div class="page">
+                <div class="text-center">
+                    <h2>Login User All Details</h2>
+
+                    <span><t t-esc="o.start_date"/>  -  <t t-esc="o.end_date"/></span>
+                </div>
+                <br/>
+                <br/>
+
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Date</th>
+                            <th>IP Address</th>
+                            <th>Host(Server) Name</th>
+<!--                            <th>OS</th>-->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-set="count" t-value="0"/>
+                        <tr t-foreach='o.gathering_user_details()' t-as='user'>
+                            <t t-set="count" t-value="count + 1"/>
+                            <td>
+                                <span t-esc="user['name']"/>
+                            </td>
+                            <td>
+                                <span t-esc="user['date_time']"/>
+                            </td>
+                            <td>
+                                <span t-esc="user['ip_address']"/>
+                            </td>
+                            <td>
+                                <span t-esc="user['socket_name']"/>
+                            </td>
+<!--                            <td>-->
+<!--                                <span t-esc="user['sys_name']"/>-->
+<!--                            </td>-->
+                        </tr>
+                        <tr>
+                            <td>
+                                <t t-if="count == 0">
+                                    <br/>
+                                    <h3 class="text-danger">No Record Found. Please Check the date once.</h3>
+                                </t>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            </t>
+        </t>
+        </t>
+    </template>
+    </data>
+</openerp>
