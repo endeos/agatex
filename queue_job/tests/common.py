@@ -9,7 +9,6 @@ from itertools import groupby
 from operator import attrgetter
 from unittest import TestCase, mock
 
-# pylint: disable=odoo-addons-relative-import
 from odoo.addons.queue_job.delay import Graph
 
 # pylint: disable=odoo-addons-relative-import
@@ -408,7 +407,9 @@ class OdooDocTestCase(doctest.DocTestCase):
     - output a more meaningful test name than default "DocTestCase.runTest"
     """
 
-    def __init__(self, doctest, optionflags=0, setUp=None, tearDown=None, checker=None):
+    def __init__(
+        self, doctest, optionflags=0, setUp=None, tearDown=None, checker=None, seq=0
+    ):
         super().__init__(
             doctest._dt_test,
             optionflags=optionflags,
@@ -416,6 +417,7 @@ class OdooDocTestCase(doctest.DocTestCase):
             tearDown=tearDown,
             checker=checker,
         )
+        self.test_sequence = seq
 
     def setUp(self):
         """Log an extra statement which test is started."""
@@ -439,8 +441,8 @@ def load_doctests(module):
             doctest.DocTestCase.doClassCleanups = lambda: None
             doctest.DocTestCase.tearDown_exceptions = []
 
-        for test in doctest.DocTestSuite(module):
-            odoo_test = OdooDocTestCase(test)
+        for idx, test in enumerate(doctest.DocTestSuite(module)):
+            odoo_test = OdooDocTestCase(test, seq=idx)
             odoo_test.test_tags = {"standard", "at_install", "queue_job", "doctest"}
             tests.addTest(odoo_test)
 

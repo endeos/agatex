@@ -2,10 +2,8 @@
 # license agpl-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
 import unittest
+from unittest import mock
 
-import mock
-
-# pylint: disable=odoo-addons-relative-import
 from odoo.addons.queue_job.delay import Delayable, DelayableGraph
 
 

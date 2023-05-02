@@ -1,16 +1,18 @@
 # Copyright 2017 Camptocamp SA
 # Copyright 2017 Creu Blanca
-# Copyright 2019 Tecnativa - Pedro M. Baeza
+# Copyright 2019-2022 Tecnativa - Pedro M. Baeza
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from datetime import date, timedelta
 
 from odoo.exceptions import UserError, ValidationError
-from odoo.tests.common import Form, tagged
+from odoo.tests import tagged
+from odoo.tests.common import Form
 
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
 
+@tagged("-at_install", "post_install")
 class TestPaymentOrderInboundBase(AccountTestInvoicingCommon):
     @classmethod
     def setUpClass(cls, chart_template_ref=None):
@@ -77,7 +79,7 @@ class TestPaymentOrderInboundBase(AccountTestInvoicingCommon):
         return invoice_form.save()
 
 
-@tagged("post_install", "-at_install")
+@tagged("-at_install", "post_install")
 class TestPaymentOrderInbound(TestPaymentOrderInboundBase):
     def test_constrains_type(self):
         with self.assertRaises(ValidationError):
@@ -97,12 +99,12 @@ class TestPaymentOrderInbound(TestPaymentOrderInboundBase):
         payment_order.write({"journal_id": self.journal.id})
 
         self.assertEqual(len(payment_order.payment_line_ids), 1)
-        self.assertEqual(len(payment_order.bank_line_ids), 0)
+        self.assertFalse(payment_order.payment_ids)
 
         # Open payment order
         payment_order.draft2open()
 
-        self.assertEqual(payment_order.bank_line_count, 1)
+        self.assertEqual(payment_order.payment_count, 1)
 
         # Generate and upload
         payment_order.open2generated()
@@ -112,10 +114,6 @@ class TestPaymentOrderInbound(TestPaymentOrderInboundBase):
         with self.assertRaises(UserError):
             payment_order.unlink()
 
-        bank_line = payment_order.bank_line_ids
-
-        with self.assertRaises(UserError):
-            bank_line.unlink()
         payment_order.action_uploaded_cancel()
         self.assertEqual(payment_order.state, "cancel")
         payment_order.cancel2draft()

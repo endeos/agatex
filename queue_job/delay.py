@@ -226,7 +226,7 @@ class DelayableGraph(Graph):
         for env in envs:
             if env.context.get("test_queue_job_no_delay"):
                 _logger.warning(
-                    "`test_queue_job_no_delay` ctx key found." " NO JOB scheduled."
+                    "`test_queue_job_no_delay` ctx key found. NO JOB scheduled."
                 )
                 return True
         return False
@@ -492,11 +492,11 @@ class Delayable:
         return [self]
 
     def __repr__(self):
-        job_method = ""
-        if self._job_method:
-            job_method = self._job_method.__name__
         return "Delayable({}.{}({}, {}))".format(
-            self.recordset, job_method, self._job_args, self._job_kwargs
+            self.recordset,
+            self._job_method.__name__ if self._job_method else "",
+            self._job_args,
+            self._job_kwargs,
         )
 
     def __del__(self):

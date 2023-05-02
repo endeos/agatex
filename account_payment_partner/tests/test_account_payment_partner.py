@@ -5,13 +5,14 @@
 from odoo import _, fields
 from odoo.exceptions import UserError, ValidationError
 from odoo.fields import Date
-from odoo.tests.common import Form, SavepointCase
+from odoo.tests.common import Form, TransactionCase
 
 
-class TestAccountPaymentPartner(SavepointCase):
+class TestAccountPaymentPartner(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
 
         cls.res_users_model = cls.env["res.users"]
         cls.move_model = cls.env["account.move"]
@@ -33,6 +34,7 @@ class TestAccountPaymentPartner(SavepointCase):
             raise ValidationError(_("No Chart of Account Template has been defined !"))
         old_company = cls.env.user.company_id
         cls.env.user.company_id = cls.company_2.id
+        cls.env.ref("base.user_admin").company_ids = [(4, cls.company_2.id)]
         cls.chart.try_loading()
         cls.env.user.company_id = old_company.id
 
@@ -105,7 +107,7 @@ class TestAccountPaymentPartner(SavepointCase):
         cls.customer_payment_mode = cls.payment_mode_model.create(
             {
                 "name": "Customers to Bank 1",
-                "bank_account_link": "fixed",
+                "bank_account_link": "variable",
                 "payment_method_id": cls.manual_in.id,
                 "company_id": cls.company.id,
                 "fixed_journal_id": cls.journal_c1.id,
@@ -294,6 +296,14 @@ class TestAccountPaymentPartner(SavepointCase):
             lambda l: l.account_id.user_type_id == self.acct_type_payable
         )
         self.assertEqual(invoice.payment_mode_id, aml[0].payment_mode_id)
+        # Test payment mode change on aml
+        mode = self.supplier_payment_mode.copy()
+        aml.payment_mode_id = mode
+        self.assertEqual(invoice.payment_mode_id, mode)
+        # Test payment mode editability on account move
+        self.assertFalse(invoice.has_reconciled_items)
+        invoice.payment_mode_id = self.supplier_payment_mode
+        self.assertEqual(aml.payment_mode_id, self.supplier_payment_mode)
 
     def test_invoice_create_out_invoice(self):
         invoice = self._create_invoice(
@@ -399,13 +409,19 @@ class TestAccountPaymentPartner(SavepointCase):
         refund_invoice_wizard = (
             self.env["account.move.reversal"]
             .with_context(
-                {
+                **{
                     "active_ids": [invoice.id],
                     "active_id": invoice.id,
                     "active_model": "account.move",
                 }
             )
-            .create({"refund_method": "refund", "reason": "reason test create"})
+            .create(
+                {
+                    "refund_method": "refund",
+                    "reason": "reason test create",
+                    "journal_id": invoice.journal_id.id,
+                }
+            )
         )
         refund_invoice = self.move_model.browse(
             refund_invoice_wizard.reverse_moves()["res_id"]
@@ -427,13 +443,19 @@ class TestAccountPaymentPartner(SavepointCase):
         refund_invoice_wizard = (
             self.env["account.move.reversal"]
             .with_context(
-                {
+                **{
                     "active_ids": [invoice.id],
                     "active_id": invoice.id,
                     "active_model": "account.move",
                 }
             )
-            .create({"refund_method": "refund", "reason": "reason test create"})
+            .create(
+                {
+                    "refund_method": "refund",
+                    "reason": "reason test create",
+                    "journal_id": invoice.journal_id.id,
+                }
+            )
         )
         refund_invoice = self.move_model.browse(
             refund_invoice_wizard.reverse_moves()["res_id"]

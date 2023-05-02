@@ -10,6 +10,7 @@ odoo.define("queue_job.fields", function (require) {
     var field_registry = require("web.field_registry");
 
     var JobDirectedGraph = AbstractField.extend({
+        /* global vis */
         className: "o_field_job_directed_graph",
         cssLibs: ["/queue_job/static/lib/vis/vis-network.min.css"],
         jsLibs: ["/queue_job/static/lib/vis/vis-network.min.js"],
@@ -89,9 +90,7 @@ odoo.define("queue_job.fields", function (require) {
             });
 
             var data = {
-                // eslint-disable-next-line no-undef
                 nodes: new vis.DataSet(nodes),
-                // eslint-disable-next-line no-undef
                 edges: new vis.DataSet(edges),
             };
             var options = {
@@ -105,7 +104,6 @@ odoo.define("queue_job.fields", function (require) {
             if (nodes.length > 100) {
                 options.physics = {stabilization: false};
             }
-            // eslint-disable-next-line no-undef
             var network = new vis.Network(this.$el[0], data, options);
             network.selectNodes([this.res_id]);
 

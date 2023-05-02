@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
 <odoo>
+    <!-- Done this way for being compatible with both community and enteprise editions -->
     <record id="menu_root_aeat" model="ir.ui.menu">
         <field name="name">AEAT reports</field>
         <field name="sequence" eval="4" />

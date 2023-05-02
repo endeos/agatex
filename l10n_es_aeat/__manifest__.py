@@ -11,7 +11,7 @@
 {
     "name": "AEAT Base",
     "summary": "Modulo base para declaraciones de la AEAT",
-    "version": "14.0.2.4.1",
+    "version": "15.0.3.0.2",
     "author": "Pexego, "
     "Acysos S.L., "
     "AvanzOSC, "
@@ -22,6 +22,7 @@
     "category": "Accounting & Finance",
     "development_status": "Mature",
     "depends": ["l10n_es", "account_tax_balance"],
+    # odoo_test_helper is needed for the tests
     "external_dependencies": {"python": ["unidecode", "cryptography"]},
     "data": [
         "security/aeat_security.xml",
@@ -47,4 +48,5 @@
     ],
     "installable": True,
     "maintainers": ["pedrobaeza"],
+    "pre_init_hook": "pre_init_hook",
 }

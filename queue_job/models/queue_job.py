@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 from odoo import _, api, exceptions, fields, models
 from odoo.osv import expression
-from odoo.tools import html_escape
+from odoo.tools import config, html_escape
 
 from odoo.addons.base_sparse_field.models.fields import Serialized
 
@@ -149,9 +149,14 @@ class QueueJob(models.Model):
 
     @api.depends("dependencies")
     def _compute_dependency_graph(self):
-        graph_uuids = [uuid for uuid in self.mapped("graph_uuid") if uuid]
         jobs_groups = self.env["queue.job"].read_group(
-            [("graph_uuid", "in", graph_uuids)],
+            [
+                (
+                    "graph_uuid",
+                    "in",
+                    [uuid for uuid in self.mapped("graph_uuid") if uuid],
+                )
+            ],
             ["graph_uuid", "ids:array_agg(id)"],
             ["graph_uuid"],
         )
@@ -216,9 +221,16 @@ class QueueJob(models.Model):
         }
 
     def _compute_graph_jobs_count(self):
-        graph_uuids = [uuid for uuid in self.mapped("graph_uuid") if uuid]
         jobs_groups = self.env["queue.job"].read_group(
-            [("graph_uuid", "in", graph_uuids)], ["graph_uuid"], ["graph_uuid"]
+            [
+                (
+                    "graph_uuid",
+                    "in",
+                    [uuid for uuid in self.mapped("graph_uuid") if uuid],
+                )
+            ],
+            ["graph_uuid"],
+            ["graph_uuid"],
         )
         count_per_graph_uuid = {
             group["graph_uuid"]: group["graph_uuid_count"] for group in jobs_groups
@@ -285,8 +297,9 @@ class QueueJob(models.Model):
         self.ensure_one()
         jobs = self.env["queue.job"].search([("graph_uuid", "=", self.graph_uuid)])
 
-        action_jobs = self.env.ref("queue_job.action_queue_job")
-        action = action_jobs.read()[0]
+        action = self.env["ir.actions.act_window"]._for_xml_id(
+            "queue_job.action_queue_job"
+        )
         action.update(
             {
                 "name": _("Jobs for graph %s") % (self.graph_uuid),
@@ -307,6 +320,7 @@ class QueueJob(models.Model):
             if state == DONE:
                 job_.set_done(result=result)
                 job_.store()
+                record.env["queue.job"].flush()
                 job_.enqueue_waiting()
             elif state == PENDING:
                 job_.set_pending(result=result)
@@ -396,6 +410,8 @@ class QueueJob(models.Model):
                 )
                 if jobs:
                     jobs.unlink()
+                    if not config["test_enable"]:
+                        self.env.cr.commit()  # pylint: disable=E8102
                 else:
                     break
         return True

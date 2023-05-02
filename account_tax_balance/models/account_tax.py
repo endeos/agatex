@@ -14,10 +14,8 @@ class AccountTax(models.Model):
     base_balance_regular = fields.Float(
         string="Base Balance", compute="_compute_balance"
     )
-    balance_refund = fields.Float(string="Balance Refund", compute="_compute_balance")
-    base_balance_refund = fields.Float(
-        string="Base Balance Refund", compute="_compute_balance"
-    )
+    balance_refund = fields.Float(compute="_compute_balance")
+    base_balance_refund = fields.Float(compute="_compute_balance")
     has_moves = fields.Boolean(
         string="Has balance in period",
         compute="_compute_has_moves",
@@ -147,8 +145,8 @@ class AccountTax(models.Model):
         domain = [
             ("move_id.state", "in", state_list),
             ("tax_line_id", "=", self.id),
-            ("tax_exigible", "=", True),
         ]
+        domain.extend(self.env["account.move.line"]._get_tax_exigible_domain())
         if type_list:
             domain.append(("move_id.financial_type", "in", type_list))
         return domain
@@ -157,8 +155,8 @@ class AccountTax(models.Model):
         domain = [
             ("move_id.state", "in", state_list),
             ("tax_ids", "in", self.id),
-            ("tax_exigible", "=", True),
         ]
+        domain.extend(self.env["account.move.line"]._get_tax_exigible_domain())
         if type_list:
             domain.append(("move_id.financial_type", "in", type_list))
         return domain
@@ -180,11 +178,11 @@ class AccountTax(models.Model):
         domain = self.get_move_lines_domain(
             tax_or_base=tax_or_base, financial_type=financial_type
         )
-        xmlid = "account.action_account_moves_all_tree"
-        action = self.env["ir.actions.act_window"]._for_xml_id(xmlid)
-        action["context"] = {}
-        action["domain"] = domain
-        return action
+        action = self.env.ref("account.action_account_moves_all_tree")
+        vals = action.sudo().read()[0]
+        vals["context"] = {}
+        vals["domain"] = domain
+        return vals
 
     def view_tax_lines(self):
         self.ensure_one()

@@ -252,7 +252,7 @@ class TestL10nEsAeatMod390(TestL10nEsAeatMod390Base):
 
     def test_model_390(self):
         # Test constraints
-        with self.assertRaises(Exception):
+        with self.assertRaises(Exception) as ex:
             self.model390.statement_type = "C"
         self.model390.button_calculate()
         # Check tax lines
@@ -264,7 +264,7 @@ class TestL10nEsAeatMod390(TestL10nEsAeatMod390Base):
                 sum(lines.mapped("amount")),
                 result,
                 2,
-                "Incorrect result in field %s" % field,
+                "Incorrect result in field %s %s" % (field, ex.exception),
             )
         # Check computed fields
         self.assertAlmostEqual(self.model390.casilla_33, 17700.0, 2)
@@ -300,6 +300,7 @@ class TestL10nEsAeatMod390(TestL10nEsAeatMod390Base):
         export_config_xml_ids = [
             "l10n_es_aeat_mod390.aeat_mod390_2019_main_export_config",
             "l10n_es_aeat_mod390.aeat_mod390_2021_main_export_config",
+            "l10n_es_aeat_mod390.aeat_mod390_2022_main_export_config",
         ]
         for xml_id in export_config_xml_ids:
             export_config = self.env.ref(xml_id)
