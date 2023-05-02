@@ -7,7 +7,6 @@
 # Copyright 2020 Valentin Vinagre <valent.vinagre@sygel.es>
 # Copyright 2021 Tecnativa - João Marques
 # Copyright 2022 ForgeFlow - Lois Rilo
-# Copyright 2022 Tecnativa - Víctor Martínez
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import json
@@ -16,6 +15,7 @@ import logging
 from requests import Session
 
 from odoo import _, api, exceptions, fields, models
+from odoo.exceptions import ValidationError
 from odoo.modules.registry import Registry
 from odoo.tools.float_utils import float_compare
 
@@ -239,12 +239,12 @@ class AccountMove(models.Model):
     def _compute_macrodata(self):
         for inv in self:
             inv.sii_macrodata = (
-                True
-                if float_compare(
-                    inv.amount_total, SII_MACRODATA_LIMIT, precision_digits=2
+                float_compare(
+                    abs(inv.amount_total_signed),
+                    SII_MACRODATA_LIMIT,
+                    precision_digits=2,
                 )
                 >= 0
-                else False
             )
 
     @api.onchange("sii_refund_type")
@@ -403,7 +403,7 @@ class AccountMove(models.Model):
             "IDVersionSii": SII_VERSION,
             "Titular": {
                 "NombreRazon": self.company_id.name[0:120],
-                "NIF": self.company_id.vat[2:],
+                "NIF": company.partner_id._parse_aeat_vat_info()[2],
             },
         }
         if not cancellation:
@@ -485,6 +485,30 @@ class AccountMove(models.Model):
             return True
         return False
 
+    def _get_tax_info(self):
+        self.ensure_one()
+        res = {}
+        for line in self.line_ids:
+            sign = -1 if self.move_type[:3] == "out" else 1
+            for tax in line.tax_ids:
+                res.setdefault(tax, {"tax": tax, "base": 0, "amount": 0})
+                res[tax]["base"] += line.balance * sign
+            if line.tax_line_id:
+                tax = line.tax_line_id
+                if "invoice" in self.move_type:
+                    repartition_lines = tax.invoice_repartition_line_ids
+                else:
+                    repartition_lines = tax.refund_repartition_line_ids
+                if (
+                    len(repartition_lines) > 2
+                    and line.tax_repartition_line_id.factor_percent < 0
+                ):
+                    # taxes with more than one "tax" repartition line must be discarded
+                    continue
+                res.setdefault(tax, {"tax": tax, "base": 0, "amount": 0})
+                res[tax]["amount"] += line.balance * sign
+        return res
+
     def _get_sii_out_taxes(self):  # noqa: C901
         """Get the taxes for sales invoices.
 
@@ -505,7 +529,7 @@ class AccountMove(models.Model):
         base_not_in_total = self._get_sii_taxes_map(["BaseNotIncludedInTotal"])
         not_in_amount_total = 0
         exempt_cause = self._get_sii_exempt_cause(taxes_sfesbe + taxes_sfesse)
-        tax_lines = self._get_aeat_tax_info()
+        tax_lines = self._get_tax_info()
         for tax_line in tax_lines.values():
             tax = tax_line["tax"]
             breakdown_taxes = taxes_sfesb + taxes_sfesisp + taxes_sfens + taxes_sfesbe
@@ -626,12 +650,13 @@ class AccountMove(models.Model):
         taxes_sfrisp = self._get_sii_taxes_map(["SFRISP"])
         taxes_sfrns = self._get_sii_taxes_map(["SFRNS"])
         taxes_sfrnd = self._get_sii_taxes_map(["SFRND"])
+        taxes_sfrbi = self._get_sii_taxes_map(["SFRBI"])
         taxes_not_in_total = self._get_sii_taxes_map(["NotIncludedInTotal"])
         taxes_not_in_total_neg = self._get_sii_taxes_map(["NotIncludedInTotalNegative"])
         base_not_in_total = self._get_sii_taxes_map(["BaseNotIncludedInTotal"])
         tax_amount = 0.0
         not_in_amount_total = 0.0
-        tax_lines = self._get_aeat_tax_info()
+        tax_lines = self._get_tax_info()
         for tax_line in tax_lines.values():
             tax = tax_line["tax"]
             if tax in taxes_not_in_total:
@@ -651,7 +676,9 @@ class AccountMove(models.Model):
                 continue
             tax_dict = self._get_sii_tax_dict(tax_line, tax_lines)
             if tax in taxes_sfrisp + taxes_sfrs:
-                tax_amount += tax_line["quote_amount"]
+                tax_amount += tax_line["amount"]
+            if tax in taxes_sfrbi:
+                tax_dict["BienInversion"] = "S"
             if tax in taxes_sfrns:
                 tax_dict.pop("TipoImpositivo")
                 tax_dict.pop("CuotaSoportada")
@@ -753,7 +780,9 @@ class AccountMove(models.Model):
             serial_number = self.thirdparty_number[0:60]
         inv_dict = {
             "IDFactura": {
-                "IDEmisorFactura": {"NIF": company.vat[2:]},
+                "IDEmisorFactura": {
+                    "NIF": company.partner_id._parse_aeat_vat_info()[2]
+                },
                 # On cancelled invoices, number is not filled
                 "NumSerieFacturaEmisor": serial_number,
                 "FechaExpedicionFacturaEmisor": invoice_date,
@@ -985,7 +1014,6 @@ class AccountMove(models.Model):
 
     def _send_invoice_to_sii(self):
         for invoice in self.filtered(lambda i: i.state in SII_VALID_INVOICE_STATES):
-            serv = invoice._connect_sii(invoice.move_type)
             if invoice.sii_state == "not_sent":
                 tipo_comunicacion = "A0"
             else:
@@ -994,8 +1022,14 @@ class AccountMove(models.Model):
             inv_vals = {
                 "sii_header_sent": json.dumps(header, indent=4),
             }
+            # add this extra try except in case _get_sii_invoice_dict fails
+            # if not, get the value inv_dict for the next try and except below
             try:
                 inv_dict = invoice._get_sii_invoice_dict()
+            except Exception as fault:
+                raise ValidationError(fault) from fault
+            try:
+                serv = invoice._connect_sii(invoice.move_type)
                 inv_vals["sii_content_sent"] = json.dumps(inv_dict, indent=4)
                 if invoice.move_type in ["out_invoice", "out_refund"]:
                     res = serv.SuministroLRFacturasEmitidas(header, inv_dict)
@@ -1054,12 +1088,13 @@ class AccountMove(models.Model):
                         "sii_send_failed": True,
                         "sii_send_error": repr(fault)[:60],
                         "sii_return": repr(fault),
+                        "sii_content_sent": json.dumps(inv_dict, indent=4),
                     }
                 )
                 invoice.write(inv_vals)
                 new_cr.commit()
                 new_cr.close()
-                raise
+                raise ValidationError(fault) from fault
 
     def _sii_invoice_dict_not_modified(self):
         self.ensure_one()
@@ -1086,6 +1121,17 @@ class AccountMove(models.Model):
                 continue
             invoice._process_invoice_for_sii_send()
         return res
+
+    def process_send_sii(self):
+        return {
+            "name": "Confirmation message for sending invoices to the SII",
+            "type": "ir.actions.act_window",
+            "view_mode": "form",
+            "res_model": "wizard.send.sii",
+            "views": [(False, "form")],
+            "target": "new",
+            "context": self.env.context,
+        }
 
     def send_sii(self):
         invoices = self.filtered(

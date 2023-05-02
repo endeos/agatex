@@ -1,16 +1,18 @@
 # © 2017 Camptocamp SA
 # © 2017 Creu Blanca
+# Copyright 2022 Tecnativa - Pedro M. Baeza
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from datetime import date, datetime, timedelta
 
 from odoo import fields
 from odoo.exceptions import UserError, ValidationError
-from odoo.tests.common import Form, tagged
+from odoo.tests import Form, tagged
 
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
 
+@tagged("-at_install", "post_install")
 class TestPaymentOrderOutboundBase(AccountTestInvoicingCommon):
     @classmethod
     def setUpClass(cls, chart_template_ref=None):
@@ -116,8 +118,9 @@ class TestPaymentOrderOutboundBase(AccountTestInvoicingCommon):
             .with_context(active_model="account.move", active_ids=move.ids)
             .create(
                 {
-                    "date_mode": "custom",
+                    "date_mode": "entry",
                     "refund_method": "refund",
+                    "journal_id": move.journal_id.id,
                 }
             )
         )
@@ -125,7 +128,7 @@ class TestPaymentOrderOutboundBase(AccountTestInvoicingCommon):
         return wizard.new_move_ids
 
 
-@tagged("post_install", "-at_install")
+@tagged("-at_install", "post_install")
 class TestPaymentOrderOutbound(TestPaymentOrderOutboundBase):
     def test_creation_due_date(self):
         self.mode.variable_journal_ids = self.bank_journal
@@ -203,7 +206,7 @@ class TestPaymentOrderOutbound(TestPaymentOrderOutboundBase):
         order.draft2open()
         order.open2generated()
         order.generated2uploaded()
-        self.assertEqual(order.move_ids[0].date, order.bank_line_ids[0].date)
+        self.assertEqual(order.move_ids[0].date, order.payment_ids[0].date)
         self.assertEqual(order.state, "uploaded")
 
     def test_cancel_payment_order(self):
@@ -220,13 +223,11 @@ class TestPaymentOrderOutbound(TestPaymentOrderOutboundBase):
         payment_order.write({"journal_id": self.bank_journal.id})
 
         self.assertEqual(len(payment_order.payment_line_ids), 1)
-        self.assertEqual(len(payment_order.bank_line_ids), 0)
+        self.assertFalse(payment_order.payment_ids)
 
         # Open payment order
         payment_order.draft2open()
-
-        self.assertEqual(payment_order.bank_line_count, 1)
-
+        self.assertEqual(payment_order.payment_count, 1)
         # Generate and upload
         payment_order.open2generated()
         payment_order.generated2uploaded()
@@ -235,10 +236,6 @@ class TestPaymentOrderOutbound(TestPaymentOrderOutboundBase):
         with self.assertRaises(UserError):
             payment_order.unlink()
 
-        bank_line = payment_order.bank_line_ids
-
-        with self.assertRaises(UserError):
-            bank_line.unlink()
         payment_order.action_uploaded_cancel()
         self.assertEqual(payment_order.state, "cancel")
         payment_order.cancel2draft()
@@ -294,19 +291,20 @@ class TestPaymentOrderOutbound(TestPaymentOrderOutboundBase):
         self.assertEqual(len(outbound_order.payment_line_ids), 2)
         self.assertEqual(outbound_order.payment_line_ids[1].date, False)
         # Open payment order
-        self.assertEqual(len(outbound_order.bank_line_ids), 0)
+        self.assertFalse(outbound_order.payment_ids)
         outbound_order.draft2open()
-        self.assertEqual(outbound_order.bank_line_count, 2)
+        self.assertEqual(outbound_order.payment_count, 2)
         self.assertEqual(
             outbound_order.payment_line_ids[0].date,
-            outbound_order.payment_line_ids[0].bank_line_id.date,
+            outbound_order.payment_line_ids[0].payment_ids.date,
         )
+        self.assertEqual(outbound_order.payment_line_ids[1].date, date.today())
         self.assertEqual(
             outbound_order.payment_line_ids[1].date,
             fields.Date.context_today(outbound_order),
         )
         self.assertEqual(
-            outbound_order.payment_line_ids[1].bank_line_id.date,
+            outbound_order.payment_line_ids[1].payment_ids.date,
             fields.Date.context_today(outbound_order),
         )
 

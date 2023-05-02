@@ -40,13 +40,13 @@ class WizardOpenTaxBalances(models.TransientModel):
 
     def open_taxes(self):
         self.ensure_one()
-        xmlid = "account_tax_balance.action_tax_balances_tree"
-        action = self.env["ir.actions.act_window"]._for_xml_id(xmlid)
+        action = self.env.ref("account_tax_balance.action_tax_balances_tree")
+        act_vals = action.sudo().read()[0]
         # override action name doesn't work in v12 or v10
         # we need to build a dynamic action on main keys
         vals = {
-            x: action[x]
-            for x in action
+            x: act_vals[x]
+            for x in act_vals
             if x
             in (
                 "res_model",

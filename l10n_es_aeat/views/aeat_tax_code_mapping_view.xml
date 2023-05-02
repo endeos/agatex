@@ -6,7 +6,7 @@
     <record id="l10n_es_aeat_map_tax_tree" model="ir.ui.view">
         <field name="model">l10n.es.aeat.map.tax</field>
         <field name="arch" type="xml">
-            <tree string="Tax mapping">
+            <tree>
                 <field name="model" />
                 <field name="date_from" />
                 <field name="date_to" />
@@ -30,16 +30,11 @@
     <record id="l10n_es_aeat_map_tax_line_tree" model="ir.ui.view">
         <field name="model">l10n.es.aeat.map.tax.line</field>
         <field name="arch" type="xml">
-            <tree string="Tax code mapping lines" editable="bottom">
+            <tree editable="bottom">
                 <field name="field_number" />
                 <field name="name" />
                 <field name="to_regularize" />
                 <field name="tax_ids" widget="many2many_tags" />
-                <field
-                    name="fiscal_position_ids"
-                    widget="many2many_tags"
-                    optional="hide"
-                />
                 <field name="account_id" />
                 <field name="move_type" />
                 <field name="field_type" />
@@ -62,7 +57,6 @@
                     </group>
                     <group>
                         <field name="tax_ids" widget="many2many_tags" />
-                        <field name="fiscal_position_ids" widget="many2many_tags" />
                         <field name="account_id" />
                         <field name="move_type" />
                         <field name="field_type" />

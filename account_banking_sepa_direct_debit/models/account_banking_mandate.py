@@ -40,7 +40,6 @@ class AccountBankingMandate(models.Model):
     )
     scheme = fields.Selection(
         [("CORE", "Basic (CORE)"), ("B2B", "Enterprise (B2B)")],
-        string="Scheme",
         default="CORE",
         tracking=80,
     )
@@ -103,14 +102,16 @@ class AccountBankingMandate(models.Model):
         )
         if expired_mandates:
             expired_mandates.write({"state": "expired"})
-            for mandate in expired_mandates:
-                mandate.message_post(
-                    body=_(
-                        "Mandate automatically set to expired after %d months without use."
-                    )
-                    % NUMBER_OF_UNUSED_MONTHS_BEFORE_EXPIRY
+            expired_mandates.message_post(
+                body=_(
+                    "Mandate automatically set to expired after %d months without use."
                 )
-                logger.info("SDD Mandate set to expired: ID %s" % (mandate.id))
+                % NUMBER_OF_UNUSED_MONTHS_BEFORE_EXPIRY
+            )
+            logger.info(
+                "%d SDD Mandate set to expired: IDs %s"
+                % (len(expired_mandates), expired_mandates.ids)
+            )
         else:
             logger.info("0 SDD Mandates had to be set to Expired")
 

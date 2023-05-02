@@ -122,7 +122,6 @@ class L10nEsAeatReport(models.AbstractModel):
         states={"draft": [("readonly", False)]},
     )
     contact_email = fields.Char(
-        string="Contact email",
         size=50,
         readonly=True,
         states={"draft": [("readonly", False)]},
@@ -135,7 +134,6 @@ class L10nEsAeatReport(models.AbstractModel):
         states={"draft": [("readonly", False)]},
     )
     year = fields.Integer(
-        string="Year",
         default=_default_year,
         required=True,
         readonly=True,
@@ -143,7 +141,6 @@ class L10nEsAeatReport(models.AbstractModel):
     )
     statement_type = fields.Selection(
         selection=[("N", "Normal"), ("C", "Complementary"), ("S", "Substitutive")],
-        string="Statement Type",
         default="N",
         readonly=True,
         required=True,
@@ -151,13 +148,12 @@ class L10nEsAeatReport(models.AbstractModel):
     )
     support_type = fields.Selection(
         selection=[("C", "DVD"), ("T", "Telematics")],
-        string="Support Type",
         default="T",
         readonly=True,
         required=True,
         states={"draft": [("readonly", False)]},
     )
-    calculation_date = fields.Datetime(string="Calculation date")
+    calculation_date = fields.Datetime()
     state = fields.Selection(
         selection=[
             ("draft", "Draft"),
@@ -166,7 +162,6 @@ class L10nEsAeatReport(models.AbstractModel):
             ("posted", "Posted"),
             ("cancelled", "Cancelled"),
         ],
-        string="State",
         default="draft",
         readonly=True,
         tracking=True,
@@ -182,7 +177,7 @@ class L10nEsAeatReport(models.AbstractModel):
             (
                 "model_id",
                 "=",
-                self.env["ir.model"].search([("model", "=", self._name)]).id,
+                self.env["ir.model"].sudo().search([("model", "=", self._name)]).id,
             )
         ],
         compute="_compute_export_config_id",
@@ -197,7 +192,6 @@ class L10nEsAeatReport(models.AbstractModel):
     )
     period_type = fields.Selection(
         selection="get_period_type_selection",
-        string="Period type",
         required=True,
         default=_default_period_type,
         readonly=True,
@@ -500,10 +494,8 @@ class L10nEsAeatReport(models.AbstractModel):
         aeat_num = getattr(self, "_aeat_number", False)
         if not aeat_num:
             raise exceptions.UserError(
-                _(
-                    "Modelo no válido: %s. Debe declarar una variable "
-                    "'_aeat_number'" % self._name
-                )
+                _("Modelo no válido: %s. Debe declarar una variable " "'_aeat_number'")
+                % self._name
             )
         seq_obj = self.env["ir.sequence"]
         sequence = "aeat%s-sequence" % aeat_num

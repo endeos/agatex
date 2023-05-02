@@ -11,8 +11,7 @@ from io import StringIO
 from psycopg2 import OperationalError, errorcodes
 from werkzeug.exceptions import BadRequest, Forbidden
 
-import odoo
-from odoo import _, http, tools
+from odoo import SUPERUSER_ID, _, api, http, registry, tools
 from odoo.service.model import PG_CONCURRENCY_ERRORS_TO_RETRY
 
 from ..delay import chain, group
@@ -73,17 +72,15 @@ class RunJobController(http.Controller):
     @http.route("/queue_job/runjob", type="http", auth="none", save_session=False)
     def runjob(self, db, job_uuid, **kw):
         http.request.session.db = db
-        env = http.request.env(user=odoo.SUPERUSER_ID)
+        env = http.request.env(user=SUPERUSER_ID)
 
         def retry_postpone(job, message, seconds=None):
             job.env.clear()
-            with odoo.api.Environment.manage():
-                with odoo.registry(job.env.cr.dbname).cursor() as new_cr:
-                    job.env = job.env(cr=new_cr)
-                    job.postpone(result=message, seconds=seconds)
-                    job.set_pending(reset_retry=False)
-                    job.store()
-                    new_cr.commit()
+            with registry(job.env.cr.dbname).cursor() as new_cr:
+                job.env = api.Environment(new_cr, SUPERUSER_ID, {})
+                job.postpone(result=message, seconds=seconds)
+                job.set_pending(reset_retry=False)
+                job.store()
 
         # ensure the job to run is in the correct state and lock the record
         env.cr.execute(
@@ -114,7 +111,7 @@ class RunJobController(http.Controller):
                 _logger.debug("%s OperationalError, postponed", job)
                 raise RetryableJobError(
                     tools.ustr(err.pgerror, errors="replace"), seconds=PG_RETRY
-                )
+                ) from err
 
         except NothingToDoJob as err:
             if str(err):
@@ -141,14 +138,12 @@ class RunJobController(http.Controller):
             traceback_txt = buff.getvalue()
             _logger.error(traceback_txt)
             job.env.clear()
-            with odoo.api.Environment.manage():
-                with odoo.registry(job.env.cr.dbname).cursor() as new_cr:
-                    job.env = job.env(cr=new_cr)
-                    vals = self._get_failure_values(job, traceback_txt, orig_exception)
-                    job.set_failed(**vals)
-                    job.store()
-                    new_cr.commit()
-                    buff.close()
+            with registry(job.env.cr.dbname).cursor() as new_cr:
+                job.env = job.env(cr=new_cr)
+                vals = self._get_failure_values(job, traceback_txt, orig_exception)
+                job.set_failed(**vals)
+                job.store()
+                buff.close()
             raise
 
         _logger.debug("%s enqueue depends started", job)
@@ -169,6 +164,7 @@ class RunJobController(http.Controller):
             "exc_message": exc_message,
         }
 
+    # flake8: noqa: C901
     @http.route("/queue_job/create_test_job", type="http", auth="user")
     def create_test_job(
         self,
@@ -179,16 +175,6 @@ class RunJobController(http.Controller):
         size=1,
         failure_rate=0,
     ):
-        """Create test jobs
-
-        Examples of urls:
-
-        * http://127.0.0.1:8069/queue_job/create_test_job: single job
-        * http://127.0.0.1:8069/queue_job/create_test_job?size=10: a graph of 10 jobs
-        * http://127.0.0.1:8069/queue_job/create_test_job?size=10&failure_rate=0.5:
-          a graph of 10 jobs, half will fail
-
-        """
         if not http.request.env.user.has_group("base.group_erp_manager"):
             raise Forbidden(_("Access Denied"))
 
@@ -262,7 +248,6 @@ class RunJobController(http.Controller):
 
     TEST_GRAPH_MAX_PER_GROUP = 5
 
-    # flake8: noqa: C901
     def _create_graph_test_jobs(
         self,
         size,

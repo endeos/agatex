@@ -5,8 +5,9 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    "name": "Show links between refunds and their originator invoices",
-    "version": "14.0.1.0.3",
+    "name": "Show links between refunds and their originator invoices.",
+    "version": "15.0.1.0.1",
+    "development_status": "Mature",
     "category": "Accounting & Finance",
     "website": "https://github.com/OCA/account-invoicing",
     "author": "Pexego, Tecnativa, Odoo Community Association (OCA)",
@@ -15,5 +16,4 @@
     "depends": ["account"],
     "license": "AGPL-3",
     "data": ["views/account_invoice_view.xml"],
-    "development_status": "Mature",
 }

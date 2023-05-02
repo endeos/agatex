@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 14.0\n"
+"Project-Id-Version: Odoo Server 15.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2022-11-23 01:46+0000\n"
+"PO-Revision-Date: 2022-11-23 09:45+0000\n"
 "Last-Translator: Dorin Hongu <dhongu@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ro\n"
@@ -23,22 +23,24 @@ msgid ""
 "<span class=\"oe_grey oe_inline\"> If the max. retries is 0, the number of "
 "retries is infinite.</span>"
 msgstr ""
+"<span class=\"oe_grey oe_inline\"> Dacă numărul max. de reîncercări este 0, "
+"numărul de reîncercări este infinit.</span>"
 
 #. module: queue_job
 #: code:addons/queue_job/controllers/main.py:0
 #, python-format
 msgid "Access Denied"
-msgstr ""
+msgstr "Acces interzis"
 
 #. module: queue_job
 #: model:ir.model.fields,field_description:queue_job.field_queue_job__message_needaction
 msgid "Action Needed"
-msgstr ""
+msgstr "Acțiune necesară"
 
 #. module: queue_job
 #: model:ir.model.fields,field_description:queue_job.field_queue_job__activity_ids
 msgid "Activities"
-msgstr ""
+msgstr "Activități"
 
 #. module: queue_job
 #: model:ir.model.fields,field_description:queue_job.field_queue_job__activity_exception_decoration
@@ -48,7 +50,7 @@ msgstr ""
 #. module: queue_job
 #: model:ir.model.fields,field_description:queue_job.field_queue_job__activity_state
 msgid "Activity State"
-msgstr ""
+msgstr "Status activitate"
 
 #. module: queue_job
 #: model:ir.model.fields,field_description:queue_job.field_queue_job__activity_type_icon
@@ -82,7 +84,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:queue_job.view_set_jobs_cancelled
 #: model_terms:ir.ui.view,arch_db:queue_job.view_set_jobs_done
 msgid "Cancel"
-msgstr ""
+msgstr "Anulează"
 
 #. module: queue_job
 #: model:ir.model,name:queue_job.model_queue_jobs_to_cancelled
@@ -147,12 +149,12 @@ msgstr ""
 #. module: queue_job
 #: model:ir.model.fields,field_description:queue_job.field_queue_job__company_id
 msgid "Company"
-msgstr "Companie"
+msgstr ""
 
 #. module: queue_job
 #: model:ir.model.fields,field_description:queue_job.field_queue_job__channel_method_name
 msgid "Complete Method Name"
-msgstr "Nume complet"
+msgstr ""
 
 #. module: queue_job
 #: model:ir.model.fields,field_description:queue_job.field_queue_job_channel__complete_name
@@ -215,10 +217,9 @@ msgstr ""
 #. module: queue_job
 #: model:ir.model.fields,field_description:queue_job.field_queue_job__name
 msgid "Description"
-msgstr "Descriere"
+msgstr ""
 
 #. module: queue_job
-#: model:ir.model.fields,field_description:queue_job.field_ir_model_fields__display_name
 #: model:ir.model.fields,field_description:queue_job.field_queue_job__display_name
 #: model:ir.model.fields,field_description:queue_job.field_queue_job_channel__display_name
 #: model:ir.model.fields,field_description:queue_job.field_queue_job_function__display_name
@@ -232,7 +233,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:queue_job.selection__queue_job__state__done
 #: model_terms:ir.ui.view,arch_db:queue_job.view_queue_job_search
 msgid "Done"
-msgstr "Efectuat"
+msgstr ""
 
 #. module: queue_job
 #: model:ir.model.fields,field_description:queue_job.field_queue_job__date_enqueued
@@ -249,7 +250,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:queue_job.field_queue_job__exc_name
 #: model_terms:ir.ui.view,arch_db:queue_job.view_queue_job_search
 msgid "Exception"
-msgstr "Excepție"
+msgstr ""
 
 #. module: queue_job
 #: model:ir.model.fields,field_description:queue_job.field_queue_job__exc_info
@@ -308,11 +309,6 @@ msgid "Followers"
 msgstr ""
 
 #. module: queue_job
-#: model:ir.model.fields,field_description:queue_job.field_queue_job__message_channel_ids
-msgid "Followers (Channels)"
-msgstr ""
-
-#. module: queue_job
 #: model:ir.model.fields,field_description:queue_job.field_queue_job__message_partner_ids
 msgid "Followers (Partners)"
 msgstr ""
@@ -349,7 +345,11 @@ msgid "Group By"
 msgstr ""
 
 #. module: queue_job
-#: model:ir.model.fields,field_description:queue_job.field_ir_model_fields__id
+#: model:ir.model.fields,field_description:queue_job.field_queue_job__has_message
+msgid "Has Message"
+msgstr ""
+
+#. module: queue_job
 #: model:ir.model.fields,field_description:queue_job.field_queue_job__id
 #: model:ir.model.fields,field_description:queue_job.field_queue_job_channel__id
 #: model:ir.model.fields,field_description:queue_job.field_queue_job_function__id
@@ -428,7 +428,7 @@ msgstr ""
 #: model:ir.module.category,name:queue_job.module_category_queue_job
 #: model:ir.ui.menu,name:queue_job.menu_queue_job_root
 msgid "Job Queue"
-msgstr "Coadă sarcini"
+msgstr ""
 
 #. module: queue_job
 #: model:res.groups,name:queue_job.group_queue_job_manager
@@ -483,7 +483,6 @@ msgid "Kwargs"
 msgstr ""
 
 #. module: queue_job
-#: model:ir.model.fields,field_description:queue_job.field_ir_model_fields____last_update
 #: model:ir.model.fields,field_description:queue_job.field_queue_job____last_update
 #: model:ir.model.fields,field_description:queue_job.field_queue_job_channel____last_update
 #: model:ir.model.fields,field_description:queue_job.field_queue_job_function____last_update
@@ -917,16 +916,6 @@ msgstr ""
 #: model:ir.model.fields.selection,name:queue_job.selection__queue_job__state__wait_dependencies
 #: model_terms:ir.ui.view,arch_db:queue_job.view_queue_job_search
 msgid "Wait Dependencies"
-msgstr ""
-
-#. module: queue_job
-#: model:ir.model.fields,field_description:queue_job.field_queue_job__website_message_ids
-msgid "Website Messages"
-msgstr ""
-
-#. module: queue_job
-#: model:ir.model.fields,help:queue_job.field_queue_job__website_message_ids
-msgid "Website communication history"
 msgstr ""
 
 #. module: queue_job

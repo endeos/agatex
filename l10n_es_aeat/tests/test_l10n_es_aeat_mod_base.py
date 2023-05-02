@@ -8,7 +8,7 @@ from odoo.tests import common
 _logger = logging.getLogger("aeat")
 
 
-class TestL10nEsAeatModBase(common.SavepointCase):
+class TestL10nEsAeatModBase(common.TransactionCase):
     accounts = {}
     # Set 'debug' attribute to True to easy debug this test
     # Do not forget to include '--log-handler aeat:DEBUG' in Odoo command line
@@ -284,7 +284,7 @@ class TestL10nEsAeatModBase(common.SavepointCase):
         aeat_grp = cls.env.ref("l10n_es_aeat.group_account_aeat")
         # Create test user
         Users = cls.env["res.users"].with_context(
-            {"no_reset_password": True, "mail_create_nosubscribe": True}
+            no_reset_password=True, mail_create_nosubscribe=True
         )
         cls.billing_user = Users.create(
             {

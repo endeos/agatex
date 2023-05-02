@@ -13,5 +13,6 @@
 * Miquel Raïch <miquel.raich@forgeflow.com>
 * Iván Antón <ozono@ozonomultimedia.com>
 * Digital5 S.L.
+* Valentin Vinagre <valentin.vinagre@sygel.es>
 * Manuel Regidor <manuel.regidor@sygel.es>
-* Eric Antones <eantones@nuobit.com>
+* Jairo Llopis (https://www.moduon.team)

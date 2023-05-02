@@ -1,5 +1,5 @@
 # Copyright 2016 Akretion (Alexis de Lattre <alexis.delattre@akretion.com>)
-# Copyright 2018-2020 Tecnativa - Pedro M. Baeza
+# Copyright 2018-2022 Tecnativa - Pedro M. Baeza
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 import base64
@@ -7,11 +7,11 @@ import base64
 from lxml import etree
 
 from odoo import fields
-from odoo.tests.common import SavepointCase
+from odoo.tests.common import TransactionCase
 from odoo.tools import float_compare
 
 
-class TestSDDBase(SavepointCase):
+class TestSDDBase(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -42,7 +42,6 @@ class TestSDDBase(SavepointCase):
         cls.payment_order_model = cls.env["account.payment.order"]
         cls.payment_line_model = cls.env["account.payment.line"]
         cls.mandate_model = cls.env["account.banking.mandate"]
-        cls.bank_line_model = cls.env["bank.payment.line"]
         cls.partner_bank_model = cls.env["res.partner.bank"]
         cls.attachment_model = cls.env["ir.attachment"]
         cls.invoice_model = cls.env["account.move"]
@@ -89,6 +88,18 @@ class TestSDDBase(SavepointCase):
                 "code": "BNKFC",
                 "bank_account_id": cls.company_bank.id,
                 "bank_id": cls.company_bank.bank_id.id,
+                "inbound_payment_method_line_ids": [
+                    (
+                        0,
+                        0,
+                        {
+                            "payment_method_id": cls.env.ref(
+                                "account_banking_sepa_direct_debit.sepa_direct_debit"
+                            ).id,
+                            "payment_account_id": cls.account_expense_company_B.id,
+                        },
+                    )
+                ],
             }
         )
         # update payment mode
@@ -194,8 +205,7 @@ class TestSDDBase(SavepointCase):
                 "code": "AJ-PURC",
                 "type": "purchase",
                 "company_id": cls.company_B.id,
-                "payment_debit_account_id": cls.account_expense_company_B.id,
-                "payment_credit_account_id": cls.account_expense_company_B.id,
+                "default_account_id": cls.account_expense_company_B.id,
             }
         )
         cls.journal_sale_company_B = cls.env["account.journal"].create(
@@ -204,8 +214,7 @@ class TestSDDBase(SavepointCase):
                 "code": "AJ-SALE",
                 "type": "sale",
                 "company_id": cls.company_B.id,
-                "payment_debit_account_id": cls.account_income_company_B.id,
-                "payment_credit_account_id": cls.account_income_company_B.id,
+                "default_account_id": cls.account_income_company_B.id,
             }
         )
         cls.journal_general_company_B = cls.env["account.journal"].create(
@@ -255,22 +264,14 @@ class TestSDDBase(SavepointCase):
         payment_order.draft2open()
         self.assertEqual(payment_order.state, "open")
         self.assertEqual(payment_order.sepa, True)
-        # Check bank payment line
-        bank_lines = self.bank_line_model.search(
-            [("partner_id", "=", self.partner_agrolait.id)]
-        )
-        self.assertEqual(len(bank_lines), 1)
-        agrolait_bank_line = bank_lines[0]
+        # Check account payment
+        agrolait_bank_line = payment_order.payment_ids[0]
         self.assertEqual(agrolait_bank_line.currency_id, self.eur_currency)
         self.assertEqual(
-            float_compare(
-                agrolait_bank_line.amount_currency, 42.0, precision_digits=accpre
-            ),
+            float_compare(agrolait_bank_line.amount, 42.0, precision_digits=accpre),
             0,
         )
-        self.assertEqual(agrolait_bank_line.communication_type, "normal")
-        self.assertEqual(agrolait_bank_line.communication, invoice1.name)
-        self.assertEqual(agrolait_bank_line.mandate_id, invoice1.mandate_id)
+        self.assertEqual(agrolait_bank_line.payment_reference, invoice1.name)
         self.assertEqual(
             agrolait_bank_line.partner_bank_id, invoice1.mandate_id.partner_bank_id
         )
