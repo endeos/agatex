@@ -86,58 +86,59 @@ class AccountMove(models.Model):
                             partner.supplier_payment_mode_id.refund_payment_mode_id
                         )
 
+    @api.depends("bank_partner_id", "payment_mode_id")
+    def _compute_partner_bank_id(self):
+        res = super()._compute_partner_bank_id()
+        for move in self:
+            payment_mode = move.payment_mode_id
+            if payment_mode:
+                if (
+                    move.move_type == "in_invoice"
+                    and payment_mode.payment_type == "outbound"
+                    and not payment_mode.payment_method_id.bank_account_required
+                ):
+                    move.partner_bank_id = False
+                    continue
+                elif move.move_type == "out_invoice":
+                    if payment_mode.payment_method_id.bank_account_required:
+                        if (
+                            payment_mode.bank_account_link == "fixed"
+                            and payment_mode.fixed_journal_id.bank_account_id
+                        ):
+                            move.partner_bank_id = (
+                                payment_mode.fixed_journal_id.bank_account_id
+                            )
+                            continue
+                    else:
+                        move.partner_bank_id = False
+            else:
+                move.partner_bank_id = False
+        return res
+
     @api.depends("line_ids.matched_credit_ids", "line_ids.matched_debit_ids")
     def _compute_has_reconciled_items(self):
         for record in self:
             lines_to_consider = record.line_ids.filtered(
-                lambda x: x.account_id.internal_type in ("receivable", "payable")
+                lambda x: x.account_id.account_type
+                in ("asset_receivable", "liability_payable")
             )
             record.has_reconciled_items = bool(
                 lines_to_consider.matched_credit_ids
                 + lines_to_consider.matched_debit_ids
             )
 
-    @api.onchange("partner_id")
-    def _onchange_partner_id(self):
-        """Force compute because the onchange chain doesn't call
-        ``_compute_partner_bank``.
-        """
-        res = super()._onchange_partner_id()
-        self._compute_partner_bank_id()
-        return res
-
-    @api.depends("partner_id", "payment_mode_id")
-    def _compute_partner_bank_id(self):
-        for move in self:
-            # No bank account assignation is done for out_invoice as this is only
-            # needed for printing purposes and it can conflict with
-            # SEPA direct debit payments. Current report prints it.
-            def get_bank_id():
-                return fields.first(
-                    move.commercial_partner_id.bank_ids.filtered(
-                        lambda b: b.company_id == move.company_id or not b.company_id
-                    )
-                )
-
-            bank_id = False
-            if move.partner_id:
-                pay_mode = move.payment_mode_id
-                if move.move_type == "in_invoice":
-                    if (
-                        pay_mode
-                        and pay_mode.payment_type == "outbound"
-                        and pay_mode.payment_method_id.bank_account_required
-                        and move.commercial_partner_id.bank_ids
-                    ):
-                        bank_id = get_bank_id()
-            move.partner_bank_id = bank_id
-
-    def _reverse_move_vals(self, default_values, cancel=True):
-        move_vals = super()._reverse_move_vals(default_values, cancel=cancel)
-        move_vals["payment_mode_id"] = self.payment_mode_id.refund_payment_mode_id.id
-        if self.move_type == "in_invoice":
-            move_vals["partner_bank_id"] = self.partner_bank_id.id
-        return move_vals
+    def _reverse_moves(self, default_values_list=None, cancel=False):
+        if not default_values_list:
+            default_values_list = [{} for _ in self]
+        for move, default_values in zip(self, default_values_list):
+            default_values[
+                "payment_mode_id"
+            ] = move.payment_mode_id.refund_payment_mode_id.id
+            if move.move_type == "in_invoice":
+                default_values["partner_bank_id"] = move.partner_bank_id.id
+        return super()._reverse_moves(
+            default_values_list=default_values_list, cancel=cancel
+        )
 
     def partner_banks_to_show(self):
         self.ensure_one()
@@ -160,12 +161,13 @@ class AccountMove(models.Model):
         # Return this as empty recordset
         return self.partner_bank_id
 
-    @api.model
-    def create(self, vals):
-        # Force compute partner_bank_id when invoice is created from SO
-        # to avoid that odoo _prepare_invoice method value will be set.
-        if self.env.context.get("active_model") == "sale.order":  # pragma: no cover
-            virtual_move = self.new(vals)
-            virtual_move._compute_partner_bank_id()
-            vals["partner_bank_id"] = virtual_move.partner_bank_id.id
-        return super().create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            # Force compute partner_bank_id when invoice is created from SO
+            # to avoid that odoo _prepare_invoice method value will be set.
+            if self.env.context.get("active_model") == "sale.order":  # pragma: no cover
+                virtual_move = self.new(vals)
+                virtual_move._compute_partner_bank_id()
+                vals["partner_bank_id"] = virtual_move.partner_bank_id.id
+        return super().create(vals_list)

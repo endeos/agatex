@@ -1,6 +1,5 @@
 # Copyright 2016 ACSONE SA/NV (<http://acsone.eu>)
-# Copyright 2022 XCG Consulting (<https://xcg-consulting.fr>)
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError

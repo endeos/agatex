@@ -48,12 +48,15 @@
                         </div>
                     </div>
                     <t t-if="o.move_record_ids">
-                        <table class="table table-condensed" name="invoice_line_table">
+                        <table
+                            class="table table-sm o_main_table table-borderless"
+                            name="invoice_line_table"
+                        >
                             <thead>
                                 <tr>
-                                    <th>Invoice</th>
-                                    <th>Date</th>
-                                    <th class="text-right">Amount</th>
+                                    <th class="text-start">Invoice</th>
+                                    <th class="text-start">Date</th>
+                                    <th class="text-end">Amount</th>
                                 </tr>
                             </thead>
                             <tbody class="invoice_tbody">
@@ -64,7 +67,7 @@
                                     <td>
                                         <span t-field="l.move_id.date" />
                                     </td>
-                                    <td class="text-right" id="subtotal">
+                                    <td class="text-end" id="subtotal">
                                         <span t-field="l.amount" />
                                     </td>
                                 </tr>
@@ -92,8 +95,8 @@
                         <table class="table table-condensed" name="invoice_line_table">
                             <thead>
                                 <tr>
-                                    <th>Date</th>
-                                    <th class="text-right">Amount</th>
+                                    <th class="text-start">Date</th>
+                                    <th class="text-end">Amount</th>
                                 </tr>
                             </thead>
                             <tbody class="invoice_tbody">
@@ -101,7 +104,7 @@
                                     <td>
                                         <span t-field="l.date" />
                                     </td>
-                                    <td class="text-right" id="subtotal">
+                                    <td class="text-end" id="subtotal">
                                         <span t-field="l.balance" />
                                     </td>
                                 </tr>

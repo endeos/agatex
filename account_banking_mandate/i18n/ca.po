@@ -140,6 +140,7 @@ msgid "Cancelled"
 msgstr "Cancel·lat"
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/account_banking_mandate.py:0
 #, python-format
 msgid ""
@@ -149,6 +150,7 @@ msgstr ""
 "No es pot validar el mandat '%s' perquè no té cap compte bancari associat."
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/account_banking_mandate.py:0
 #, python-format
 msgid "Cannot validate the mandate '%s' without a date of signature."
@@ -281,7 +283,6 @@ msgstr "Icona per a indicar una activitat d'excepció."
 
 #. module: account_banking_mandate
 #: model:ir.model.fields,help:account_banking_mandate.field_account_banking_mandate__message_needaction
-#: model:ir.model.fields,help:account_banking_mandate.field_account_banking_mandate__message_unread
 msgid "If checked, new messages require your attention."
 msgstr "Si es marca els missatges nous requeriran la vostra atenció."
 
@@ -341,18 +342,21 @@ msgid "Mandate Required"
 msgstr "Mandat requerit"
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/account_banking_mandate.py:0
 #, python-format
 msgid "Mandate should be in cancel state."
 msgstr "El mandat hauria d'estar en estat cancel·lat."
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/account_banking_mandate.py:0
 #, python-format
 msgid "Mandate should be in draft or valid state."
 msgstr "El mandat hauria de ser en estat esborrany o validat."
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/account_banking_mandate.py:0
 #, python-format
 msgid "Mandate should be in draft state."
@@ -379,6 +383,7 @@ msgid "Messages"
 msgstr "Missatges"
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/account_payment_line.py:0
 #, python-format
 msgid "Missing Mandate on payment line %s"
@@ -422,18 +427,13 @@ msgstr "Nombre d'errors"
 
 #. module: account_banking_mandate
 #: model:ir.model.fields,help:account_banking_mandate.field_account_banking_mandate__message_needaction_counter
-msgid "Number of messages which requires an action"
-msgstr "Nombre de missatges que requereixen una acció"
+msgid "Number of messages requiring action"
+msgstr ""
 
 #. module: account_banking_mandate
 #: model:ir.model.fields,help:account_banking_mandate.field_account_banking_mandate__message_has_error_counter
 msgid "Number of messages with delivery error"
 msgstr "Nombre de missatges amb error de lliurament"
-
-#. module: account_banking_mandate
-#: model:ir.model.fields,help:account_banking_mandate.field_account_banking_mandate__message_unread_counter
-msgid "Number of unread messages"
-msgstr "Nombre de missatges no llegits"
 
 #. module: account_banking_mandate
 #: model:ir.model.fields,help:account_banking_mandate.field_account_banking_mandate__state
@@ -466,6 +466,7 @@ msgid "Payment Methods"
 msgstr "Mètodes de pagament"
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/account_banking_mandate.py:0
 #: model_terms:ir.ui.view,arch_db:account_banking_mandate.views_mandate_form_buttons
 #, python-format
@@ -537,12 +538,14 @@ msgstr ""
 "Planificada: Activitats futures."
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/account_banking_mandate.py:0
 #, python-format
 msgid "The date of signature of mandate '%s' is in the future!"
 msgstr "La data de la signatura del mandat %s no pot ser posterior a avui!"
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/account_banking_mandate.py:0
 #, python-format
 msgid ""
@@ -553,6 +556,7 @@ msgstr ""
 "signatura."
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/account_payment_line.py:0
 #, python-format
 msgid ""
@@ -561,6 +565,7 @@ msgid ""
 msgstr ""
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/account_payment_line.py:0
 #, python-format
 msgid ""
@@ -592,16 +597,6 @@ msgid "Unique Mandate Reference"
 msgstr "Referència única del mandat"
 
 #. module: account_banking_mandate
-#: model:ir.model.fields,field_description:account_banking_mandate.field_account_banking_mandate__message_unread
-msgid "Unread Messages"
-msgstr "Missatges no llegits"
-
-#. module: account_banking_mandate
-#: model:ir.model.fields,field_description:account_banking_mandate.field_account_banking_mandate__message_unread_counter
-msgid "Unread Messages Counter"
-msgstr "Total de missatges no llegits"
-
-#. module: account_banking_mandate
 #: model:ir.model.fields.selection,name:account_banking_mandate.selection__account_banking_mandate__state__valid
 #: model_terms:ir.ui.view,arch_db:account_banking_mandate.view_mandate_search
 msgid "Valid"
@@ -624,6 +619,7 @@ msgid "Website communication history"
 msgstr "Historial de comunicacions del lloc Web"
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/res_partner_bank.py:0
 #, python-format
 msgid ""
@@ -651,6 +647,12 @@ msgstr ""
 #~ msgid "Mandate"
 #~ msgstr "Mandat SEPA"
 
+#~ msgid "Number of messages which requires an action"
+#~ msgstr "Nombre de missatges que requereixen una acció"
+
+#~ msgid "Number of unread messages"
+#~ msgstr "Nombre de missatges no llegits"
+
 #, python-format
 #~ msgid ""
 #~ "The payment line number %s a different company than that of the linked "
@@ -668,6 +670,12 @@ msgstr ""
 #~ "La línia de pagament amb el número %s té el compte bancari '%s', que no "
 #~ "està associat al mandat '%s' (aquest mandat està associat al compte "
 #~ "bancari '%s')."
+
+#~ msgid "Unread Messages"
+#~ msgstr "Missatges no llegits"
+
+#~ msgid "Unread Messages Counter"
+#~ msgstr "Total de missatges no llegits"
 
 #, fuzzy
 #~ msgid "Journal Entries"

@@ -91,13 +91,15 @@ class AccountPaymentLine(models.Model):
         )
     ]
 
-    @api.model
-    def create(self, vals):
-        if vals.get("name", "New") == "New":
-            vals["name"] = (
-                self.env["ir.sequence"].next_by_code("account.payment.line") or "New"
-            )
-        return super(AccountPaymentLine, self).create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get("name", "New") == "New":
+                vals["name"] = (
+                    self.env["ir.sequence"].next_by_code("account.payment.line")
+                    or "New"
+                )
+        return super().create(vals_list)
 
     @api.depends("amount_currency", "currency_id", "company_currency_id", "date")
     def _compute_amount_company_currency(self):
@@ -190,6 +192,9 @@ class AccountPaymentLine(models.Model):
             "date": self[:1].date,
             "currency_id": self.currency_id.id,
             "ref": self.order_id.name,
+            # Put the name as the wildcard for forcing a unique name. If not, Odoo gets
+            # the sequence for all the payment at the same time
+            "name": "/",
             "payment_reference": "-".join([line.communication for line in self]),
             "journal_id": journal.id,
             "partner_bank_id": self.partner_bank_id.id,

@@ -20,6 +20,7 @@ msgstr ""
 "2:1));\n"
 
 #. module: account_payment_order
+#. odoo-python
 #: code:addons/account_payment_order/models/account_move.py:0
 #, python-format
 msgid ""
@@ -28,6 +29,7 @@ msgid ""
 msgstr ""
 
 #. module: account_payment_order
+#. odoo-python
 #: code:addons/account_payment_order/models/account_move.py:0
 #, python-format
 msgid ""
@@ -72,6 +74,7 @@ msgid "A payment line already exists with this reference in the same company!"
 msgstr ""
 
 #. module: account_payment_order
+#. odoo-python
 #: code:addons/account_payment_order/models/res_bank.py:0
 #, python-format
 msgid ""
@@ -254,6 +257,7 @@ msgid "Communication Type"
 msgstr ""
 
 #. module: account_payment_order
+#. odoo-python
 #: code:addons/account_payment_order/models/account_payment_line.py:0
 #, python-format
 msgid "Communication is empty on payment line %s."
@@ -516,7 +520,6 @@ msgstr ""
 
 #. module: account_payment_order
 #: model:ir.model.fields,help:account_payment_order.field_account_payment_order__message_needaction
-#: model:ir.model.fields,help:account_payment_order.field_account_payment_order__message_unread
 msgid "If checked, new messages require your attention."
 msgstr ""
 
@@ -668,18 +671,21 @@ msgid "Messages"
 msgstr ""
 
 #. module: account_payment_order
+#. odoo-python
 #: code:addons/account_payment_order/models/account_payment_order.py:0
 #, python-format
 msgid "Missing Bank Journal on payment order %s."
 msgstr ""
 
 #. module: account_payment_order
+#. odoo-python
 #: code:addons/account_payment_order/models/account_payment_line.py:0
 #, python-format
 msgid "Missing Partner Bank Account on payment line %s"
 msgstr ""
 
 #. module: account_payment_order
+#. odoo-python
 #: code:addons/account_payment_order/models/account_payment_order.py:0
 #, python-format
 msgid "Missing bank account on bank journal '%s'."
@@ -727,25 +733,35 @@ msgid "Next Activity Type"
 msgstr ""
 
 #. module: account_payment_order
+#. odoo-python
 #: code:addons/account_payment_order/models/account_move.py:0
 #, python-format
 msgid ""
-"No Payment Line created for invoice %s because it already exists or because "
-"this invoice is already paid."
+"No Payment Line created for invoice %s because its payment mode is not "
+"intended for payment orders."
 msgstr ""
 
 #. module: account_payment_order
+#. odoo-python
 #: code:addons/account_payment_order/models/account_move.py:0
 #, python-format
 msgid "No Payment Mode on invoice %s"
 msgstr ""
 
 #. module: account_payment_order
+#. odoo-python
 #: code:addons/account_payment_order/models/account_payment_order.py:0
 #, python-format
 msgid ""
 "No handler for this payment method. Maybe you haven't installed the related "
 "Odoo module."
+msgstr ""
+
+#. module: account_payment_order
+#. odoo-python
+#: code:addons/account_payment_order/models/account_move.py:0
+#, python-format
+msgid "No pending AR/AP lines to add on %s"
 msgstr ""
 
 #. module: account_payment_order
@@ -775,7 +791,7 @@ msgstr ""
 
 #. module: account_payment_order
 #: model:ir.model.fields,help:account_payment_order.field_account_payment_order__message_needaction_counter
-msgid "Number of messages which requires an action"
+msgid "Number of messages requiring action"
 msgstr ""
 
 #. module: account_payment_order
@@ -784,16 +800,7 @@ msgid "Number of messages with delivery error"
 msgstr ""
 
 #. module: account_payment_order
-#: model:ir.model.fields,help:account_payment_order.field_account_payment_order__message_unread_counter
-msgid "Number of unread messages"
-msgstr ""
-
-#. module: account_payment_order
-#: model:ir.model.fields,field_description:account_payment_order.field_account_payment__old_bank_payment_line_name
-msgid "Old Bank Payment Line Name"
-msgstr ""
-
-#. module: account_payment_order
+#. odoo-python
 #: code:addons/account_payment_order/models/account_payment_order.py:0
 #, python-format
 msgid ""
@@ -854,6 +861,7 @@ msgid "Payment Execution Date Type"
 msgstr ""
 
 #. module: account_payment_order
+#. odoo-python
 #: code:addons/account_payment_order/models/account_payment_order.py:0
 #, python-format
 msgid "Payment File"
@@ -932,6 +940,11 @@ msgid "Payment Reference"
 msgstr ""
 
 #. module: account_payment_order
+#: model_terms:ir.ui.view,arch_db:account_payment_order.account_payment_line_form
+msgid "Payment Transaction"
+msgstr ""
+
+#. module: account_payment_order
 #: model:ir.model.fields,field_description:account_payment_order.field_account_payment_order__payment_ids
 #: model_terms:ir.ui.view,arch_db:account_payment_order.account_payment_order_form
 #: model_terms:ir.ui.view,arch_db:account_payment_order.account_payment_order_tree
@@ -998,6 +1011,7 @@ msgid "Search Payment Orders"
 msgstr ""
 
 #. module: account_payment_order
+#. odoo-python
 #: code:addons/account_payment_order/wizard/account_payment_line_create.py:0
 #, python-format
 msgid "Select Move Lines to Create Transactions"
@@ -1063,6 +1077,7 @@ msgid "Technical model for printing payment order"
 msgstr ""
 
 #. module: account_payment_order
+#. odoo-python
 #: code:addons/account_payment_order/models/account_payment_order.py:0
 #, python-format
 msgid ""
@@ -1070,12 +1085,22 @@ msgid ""
 msgstr ""
 
 #. module: account_payment_order
+#. odoo-python
+#: code:addons/account_payment_order/models/account_move.py:0
+#, python-format
+msgid ""
+"The invoice %(move)s is already added in the payment order(s) %(order)s."
+msgstr ""
+
+#. module: account_payment_order
+#. odoo-python
 #: code:addons/account_payment_order/models/account_move.py:0
 #, python-format
 msgid "The invoice %s is not in Posted state"
 msgstr ""
 
 #. module: account_payment_order
+#. odoo-python
 #: code:addons/account_payment_order/models/account_payment_order.py:0
 #, python-format
 msgid ""
@@ -1085,6 +1110,7 @@ msgid ""
 msgstr ""
 
 #. module: account_payment_order
+#. odoo-python
 #: code:addons/account_payment_order/models/account_payment_order.py:0
 #, python-format
 msgid ""
@@ -1093,12 +1119,14 @@ msgid ""
 msgstr ""
 
 #. module: account_payment_order
+#. odoo-python
 #: code:addons/account_payment_order/models/account_payment_order.py:0
 #, python-format
 msgid "There are no transactions on payment order %s."
 msgstr ""
 
 #. module: account_payment_order
+#. odoo-python
 #: code:addons/account_payment_order/models/account_payment_order.py:0
 #, python-format
 msgid "There's at least one validation error:\n"
@@ -1162,16 +1190,6 @@ msgid "Type of the exception activity on record."
 msgstr ""
 
 #. module: account_payment_order
-#: model:ir.model.fields,field_description:account_payment_order.field_account_payment_order__message_unread
-msgid "Unread Messages"
-msgstr ""
-
-#. module: account_payment_order
-#: model:ir.model.fields,field_description:account_payment_order.field_account_payment_order__message_unread_counter
-msgid "Unread Messages Counter"
-msgstr ""
-
-#. module: account_payment_order
 #: model_terms:ir.ui.view,arch_db:account_payment_order.print_account_payment_order_document
 msgid "Value Date"
 msgstr ""
@@ -1192,6 +1210,7 @@ msgid "Wizard to create payment lines"
 msgstr ""
 
 #. module: account_payment_order
+#. odoo-python
 #: code:addons/account_payment_order/models/account_payment_order.py:0
 #, python-format
 msgid ""

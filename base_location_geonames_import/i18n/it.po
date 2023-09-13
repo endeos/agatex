@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: Odoo Server 11.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-01-03 20:26+0000\n"
-"PO-Revision-Date: 2023-03-30 14:25+0000\n"
+"PO-Revision-Date: 2023-04-17 16:35+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: Italian (https://www.transifex.com/oca/teams/23907/it/)\n"
 "Language: it\n"
@@ -20,10 +20,11 @@ msgstr ""
 "X-Generator: Weblate 4.14.1\n"
 
 #. module: base_location_geonames_import
+#. odoo-python
 #: code:addons/base_location_geonames_import/wizard/geonames_import.py:0
 #, python-format
 msgid "%d could not be deleted %"
-msgstr ""
+msgstr "%d non può essere cancellato %"
 
 #. module: base_location_geonames_import
 #: model_terms:ir.ui.view,arch_db:base_location_geonames_import.city_zip_geonames_import_form
@@ -87,14 +88,15 @@ msgstr ""
 #. module: base_location_geonames_import
 #: model:ir.model.fields,field_description:base_location_geonames_import.field_res_country__geonames_state_code_column
 msgid "Geonames State Code Column"
-msgstr ""
+msgstr "Codice colonna Stato"
 
 #. module: base_location_geonames_import
 #: model:ir.model.fields,field_description:base_location_geonames_import.field_res_country__geonames_state_name_column
 msgid "Geonames State Name Column"
-msgstr ""
+msgstr "Codice colonna Nome"
 
 #. module: base_location_geonames_import
+#. odoo-python
 #: code:addons/base_location_geonames_import/wizard/geonames_import.py:0
 #, python-format
 msgid "Got an error %d when trying to download the file %s."
@@ -112,9 +114,8 @@ msgstr "Importa"
 
 #. module: base_location_geonames_import
 #: model:ir.model,name:base_location_geonames_import.model_city_zip_geonames_import
-#, fuzzy
 msgid "Import City Zips from Geonames"
-msgstr "Importa Better Zip da Geonames"
+msgstr "Importare i CAP di Città da Geonames"
 
 #. module: base_location_geonames_import
 #: model:ir.actions.act_window,name:base_location_geonames_import.city_zip_geonames_import_action
@@ -131,12 +132,12 @@ msgstr "Ultima modifica il"
 #. module: base_location_geonames_import
 #: model:ir.model.fields,field_description:base_location_geonames_import.field_city_zip_geonames_import__write_uid
 msgid "Last Updated by"
-msgstr "Ultimo caricamento il"
+msgstr "Ultimo aggiornamento di"
 
 #. module: base_location_geonames_import
 #: model:ir.model.fields,field_description:base_location_geonames_import.field_city_zip_geonames_import__write_date
 msgid "Last Updated on"
-msgstr "Ultimo caricamento di"
+msgstr "Ultimo aggiornamento il"
 
 #. module: base_location_geonames_import
 #: model:ir.model.fields,field_description:base_location_geonames_import.field_city_zip_geonames_import__letter_case

@@ -126,8 +126,8 @@ class Mod349(models.Model):
             self._create_349_record_detail(move_line)
 
     def _create_349_record_detail(self, move_line):
-        types = move_line.move_id.mapped("line_ids.account_id.internal_type")
-        sign = 1 if "payable" in types else -1
+        types = move_line.move_id.mapped("line_ids.account_id.account_type")
+        sign = 1 if "liability_payable" in types else -1
         return self.env["l10n.es.aeat.mod349.partner_record_detail"].create(
             {
                 "report_id": self.id,
@@ -137,8 +137,8 @@ class Mod349(models.Model):
         )
 
     def _create_349_refund_detail(self, move_line):
-        types = move_line.move_id.mapped("line_ids.account_id.internal_type")
-        sign = 1 if "receivable" in types else -1
+        types = move_line.move_id.mapped("line_ids.account_id.account_type")
+        sign = 1 if "asset_receivable" in types else -1
         return self.env["l10n.es.aeat.mod349.partner_refund_detail"].create(
             {
                 "report_id": self.id,
@@ -206,6 +206,7 @@ class Mod349(models.Model):
             refund_detail = first(refund_details)
             move_line = refund_detail.refund_line_id
             partner = move_line.partner_id
+            op_key = move_line.l10n_es_aeat_349_operation_key
             if not origin_invoice:
                 # TODO: Instead continuing, generate an empty record and a msg
                 continue
@@ -381,7 +382,7 @@ class Mod349(models.Model):
             self._create_349_invoice_records()
             self._create_349_refund_records()
         # Recompute all pending computed fields
-        self.recompute()
+        self.flush_recordset()
         return True
 
     def button_recover(self):
@@ -426,7 +427,7 @@ class Mod349(models.Model):
         """Checks if all the fields of the report are correctly filled"""
         self._check_names()
         self._check_report_lines()
-        return super(Mod349, self).button_confirm()
+        return super().button_confirm()
 
 
 class Mod349PartnerRecord(models.Model):

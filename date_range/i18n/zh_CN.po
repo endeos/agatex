@@ -21,12 +21,14 @@ msgstr ""
 "X-Generator: Weblate 3.10\n"
 
 #. module: date_range
+#. odoo-python
 #: code:addons/date_range/models/date_range.py:0
 #, python-format
 msgid "%(name)s is not a valid range (%(date_start)s > %(date_end)s)"
 msgstr ""
 
 #. module: date_range
+#. odoo-python
 #: code:addons/date_range/models/date_range.py:0
 #, python-format
 msgid "%(thisname)s overlaps %(dtname)s"
@@ -69,7 +71,6 @@ msgstr "允许重叠"
 #. module: date_range
 #: model:ir.actions.server,name:date_range.ir_cron_autocreate_ir_actions_server
 #: model:ir.cron,cron_name:date_range.ir_cron_autocreate
-#: model:ir.cron,name:date_range.ir_cron_autocreate
 msgid "Auto-generate date ranges"
 msgstr ""
 
@@ -197,7 +198,7 @@ msgstr "结束日期"
 msgid ""
 "Evaluated expression. E.g. \"'FY%s' % date_start.strftime('%Y%m%d')\"\n"
 "You can use the Date types 'date_end' and 'date_start', as well as the "
-"'index' variable, and also babel.dates.format_date method."
+"'index' variable."
 msgstr ""
 
 #. module: date_range
@@ -230,6 +231,7 @@ msgid "If sets date range of same type must not overlap."
 msgstr "如果设置相同类型的日期范围不得重叠。"
 
 #. module: date_range
+#. odoo-python
 #: code:addons/date_range/wizard/date_range_generator.py:0
 #, python-format
 msgid "Invalid name expression: %s"
@@ -268,6 +270,7 @@ msgid "Name"
 msgstr "名称"
 
 #. module: date_range
+#. odoo-python
 #: code:addons/date_range/wizard/date_range_generator.py:0
 #, python-format
 msgid "No ranges to generate with these settings"
@@ -289,18 +292,21 @@ msgid "Parameters"
 msgstr ""
 
 #. module: date_range
+#. odoo-python
 #: code:addons/date_range/models/date_range_search_mixin.py:0
 #, python-format
 msgid "Period"
 msgstr ""
 
 #. module: date_range
+#. odoo-python
 #: code:addons/date_range/wizard/date_range_generator.py:0
 #, python-format
 msgid "Please enter an end date, or the number of ranges to generate."
 msgstr ""
 
 #. module: date_range
+#. odoo-python
 #: code:addons/date_range/wizard/date_range_generator.py:0
 #, python-format
 msgid "Please set a prefix or an expression to generate the range names."
@@ -341,6 +347,7 @@ msgid "Submit"
 msgstr "提交"
 
 #. module: date_range
+#. odoo-python
 #: code:addons/date_range/wizard/date_range_generator.py:0
 #, python-format
 msgid ""
@@ -382,6 +389,7 @@ msgid "Until"
 msgstr ""
 
 #. module: date_range
+#. odoo-python
 #: code:addons/date_range/models/date_range_type.py:0
 #, python-format
 msgid ""

@@ -20,6 +20,7 @@ class L10nEsVatBookLine(models.Model):
     ref = fields.Char("Reference")
     entry_number = fields.Integer()
     external_ref = fields.Char("External Reference")
+
     line_type = fields.Selection(
         selection=[
             ("issued", "Issued"),
@@ -29,9 +30,14 @@ class L10nEsVatBookLine(models.Model):
         ],
     )
     invoice_date = fields.Date()
+
     partner_id = fields.Many2one(comodel_name="res.partner", string="Empresa")
     vat_number = fields.Char(string="NIF")
+
     vat_book_id = fields.Many2one(comodel_name="l10n.es.vat.book", string="Vat Book id")
+
+    move_id = fields.Many2one(comodel_name="account.move", string="Invoice")
+
     move_id = fields.Many2one(comodel_name="account.move", string="Journal Entry")
     tax_line_ids = fields.One2many(
         comodel_name="l10n.es.vat.book.line.tax",
@@ -39,7 +45,9 @@ class L10nEsVatBookLine(models.Model):
         string="Tax Lines",
         copy=False,
     )
+
     exception_text = fields.Char()
+
     base_amount = fields.Float(
         string="Base",
     )

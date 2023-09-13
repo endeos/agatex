@@ -35,14 +35,10 @@ class GeneralLedgerXslx(models.AbstractModel):
         if report.show_cost_center:
             res += [
                 {
-                    "header": _("Analytic Account"),
-                    "field": "analytic_account",
+                    "header": _("Analytic Distribution"),
+                    "field": "analytic_distribution",
                     "width": 20,
                 },
-            ]
-        if report.show_analytic_tags:
-            res += [
-                {"header": _("Tags"), "field": "tags", "width": 10},
             ]
         res += [
             {"header": _("Rec."), "field": "rec_name", "width": 15},
@@ -114,10 +110,6 @@ class GeneralLedgerXslx(models.AbstractModel):
             ],
             [_("Centralize filter"), _("Yes") if report.centralize else _("No")],
             [
-                _("Show analytic tags"),
-                _("Yes") if report.show_analytic_tags else _("No"),
-            ],
-            [
                 _("Show foreign currency"),
                 _("Yes") if report.foreign_currency else _("No"),
             ],
@@ -147,7 +139,7 @@ class GeneralLedgerXslx(models.AbstractModel):
         accounts_data = res_data["accounts_data"]
         journals_data = res_data["journals_data"]
         taxes_data = res_data["taxes_data"]
-        tags_data = res_data["tags_data"]
+        analytic_data = res_data["analytic_data"]
         filter_partner_ids = res_data["filter_partner_ids"]
         foreign_currency = res_data["foreign_currency"]
         # For each account
@@ -194,17 +186,25 @@ class GeneralLedgerXslx(models.AbstractModel):
                         )
                     if line["ref_label"] != "Centralized entries":
                         taxes_description = ""
-                        tags = ""
+                        analytic_distribution = ""
                         for tax_id in line["tax_ids"]:
                             taxes_description += taxes_data[tax_id]["tax_name"] + " "
                         if line["tax_line_id"]:
                             taxes_description += line["tax_line_id"][1]
-                        for tag_id in line["tag_ids"]:
-                            tags += tags_data[tag_id]["name"] + " "
+                        for account_id, value in line["analytic_distribution"].items():
+                            if value < 100:
+                                analytic_distribution += "%s %d%% " % (
+                                    analytic_data[int(account_id)]["name"],
+                                    value,
+                                )
+                            else:
+                                analytic_distribution += (
+                                    "%s " % analytic_data[int(account_id)]["name"]
+                                )
                         line.update(
                             {
                                 "taxes_description": taxes_description,
-                                "tags": tags,
+                                "analytic_distribution": analytic_distribution,
                             }
                         )
                     if foreign_currency:
@@ -237,6 +237,15 @@ class GeneralLedgerXslx(models.AbstractModel):
                     # Display array header for move lines
                     self.write_array_header(report_data)
 
+                    account.update(
+                        {
+                            "currency_id": accounts_data[account["id"]]["currency_id"],
+                            "currency_name": accounts_data[account["id"]][
+                                "currency_name"
+                            ],
+                        }
+                    )
+
                     # Display initial balance line for partner
                     group_item.update(
                         {
@@ -248,6 +257,9 @@ class GeneralLedgerXslx(models.AbstractModel):
                             if "grouped_by" in account
                             else "",
                             "currency_id": accounts_data[account["id"]]["currency_id"],
+                            "currency_name": accounts_data[account["id"]][
+                                "currency_name"
+                            ],
                         }
                     )
                     if foreign_currency:
@@ -275,17 +287,27 @@ class GeneralLedgerXslx(models.AbstractModel):
                             )
                         if line["ref_label"] != "Centralized entries":
                             taxes_description = ""
-                            tags = ""
+                            analytic_distribution = ""
                             for tax_id in line["tax_ids"]:
                                 taxes_description += (
                                     taxes_data[tax_id]["tax_name"] + " "
                                 )
-                            for tag_id in line["tag_ids"]:
-                                tags += tags_data[tag_id]["name"] + " "
+                            for account_id, value in line[
+                                "analytic_distribution"
+                            ].items():
+                                if value < 100:
+                                    analytic_distribution += "%s %d%% " % (
+                                        analytic_data[int(account_id)]["name"],
+                                        value,
+                                    )
+                                else:
+                                    analytic_distribution += (
+                                        "%s " % analytic_data[int(account_id)]["name"]
+                                    )
                             line.update(
                                 {
                                     "taxes_description": taxes_description,
-                                    "tags": tags,
+                                    "analytic_distribution": analytic_distribution,
                                 }
                             )
                         if foreign_currency:
@@ -305,8 +327,6 @@ class GeneralLedgerXslx(models.AbstractModel):
                         group_item.update(
                             {
                                 "final_bal_curr": group_item["fin_bal"]["bal_curr"],
-                                "currency_name": group_item["currency_id"].name,
-                                "currency_id": group_item["currency_id"].id,
                             }
                         )
                     self.write_ending_balance_from_dict(group_item, report_data)
@@ -326,8 +346,6 @@ class GeneralLedgerXslx(models.AbstractModel):
                         account.update(
                             {
                                 "final_bal_curr": account["fin_bal"]["bal_curr"],
-                                "currency_name": account["currency_id"].name,
-                                "currency_id": account["currency_id"].id,
                             }
                         )
                     self.write_ending_balance_from_dict(account, report_data)

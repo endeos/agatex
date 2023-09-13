@@ -28,7 +28,7 @@ class TestPaymentOrderOutboundBase(AccountTestInvoicingCommon):
             {
                 "name": "Test account",
                 "code": "TEST1",
-                "user_type_id": cls.env.ref("account.data_account_type_expenses").id,
+                "account_type": "expense",
             }
         )
         cls.mode = cls.env["account.payment.mode"].create(
@@ -209,6 +209,14 @@ class TestPaymentOrderOutbound(TestPaymentOrderOutboundBase):
         self.assertEqual(order.move_ids[0].date, order.payment_ids[0].date)
         self.assertEqual(order.state, "uploaded")
 
+    def test_account_payment_line_creation_without_payment_mode(self):
+        self.invoice.payment_mode_id = False
+        self.invoice.action_post()
+        with self.assertRaises(UserError):
+            self.env["account.invoice.payment.line.multi"].with_context(
+                active_model="account.move", active_ids=self.invoice.ids
+            ).create({}).run()
+
     def test_cancel_payment_order(self):
         # Open invoice
         self.invoice.action_post()
@@ -361,10 +369,10 @@ class TestPaymentOrderOutbound(TestPaymentOrderOutboundBase):
 
         # The user add the outstanding payment to the invoice
         invoice_line = self.invoice.line_ids.filtered(
-            lambda line: line.account_internal_type == "payable"
+            lambda line: line.account_type == "liability_payable"
         )
         refund_line = self.refund.line_ids.filtered(
-            lambda line: line.account_internal_type == "payable"
+            lambda line: line.account_type == "liability_payable"
         )
         (invoice_line | refund_line).reconcile()
 
@@ -399,7 +407,7 @@ class TestPaymentOrderOutbound(TestPaymentOrderOutboundBase):
         self.refund.action_post()
 
         (self.invoice.line_ids + self.refund.line_ids).filtered(
-            lambda line: line.account_internal_type == "payable"
+            lambda line: line.account_type == "liability_payable"
         ).reconcile()
 
         self.env["account.invoice.payment.line.multi"].with_context(
