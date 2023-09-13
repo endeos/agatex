@@ -22,3 +22,4 @@ https://github.com/OCA/product-attribute
 https://github.com/OCA/queue
 https://github.com/OCA/reporting-engine
 https://github.com/OCA/margin-analysis
+https://github.com/OCA/server-backend

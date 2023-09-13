@@ -90,3 +90,7 @@
 	path = OCA/margin-analysis
 	url = https://github.com/OCA/margin-analysis
 	branch = 16.0
+[submodule "OCA/server-backend"]
+	path = OCA/server-backend
+	url = https://github.com/OCA/server-backend
+	branch = 16.0
