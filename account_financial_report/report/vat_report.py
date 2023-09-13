@@ -236,5 +236,4 @@ class VATReport(models.AbstractModel):
             "balance",
             "tax_line_id",
             "tax_ids",
-            "analytic_tag_ids",
         ]

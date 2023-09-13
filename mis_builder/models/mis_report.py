@@ -182,7 +182,7 @@ class MisReportKpi(models.Model):
     def _inverse_expression(self):
         for kpi in self:
             if kpi.multi:
-                raise UserError(_("Can not update a multi kpi from " "the kpi line"))
+                continue
             if kpi.expression_ids:
                 kpi.expression_ids[0].write({"name": kpi.expression, "subkpi_id": None})
                 for expression in kpi.expression_ids[1:]:
@@ -920,7 +920,7 @@ class MisReport(models.Model):
 
         :param: target_move: all|posted
         :param: aml_model_name: an optional move-line-like model name
-                (defaults to accaount.move.line)
+                (defaults to account.move.line)
         """
         if not self._supports_target_move_filter(aml_model_name):
             return []

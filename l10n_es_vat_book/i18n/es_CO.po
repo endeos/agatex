@@ -142,6 +142,11 @@ msgid "Company"
 msgstr ""
 
 #. module: l10n_es_vat_book
+#: model_terms:ir.ui.view,arch_db:l10n_es_vat_book.vat_book_invoices_head
+msgid "Company Name"
+msgstr ""
+
+#. module: l10n_es_vat_book
 #: model:ir.model.fields,help:l10n_es_vat_book.field_l10n_es_vat_book__partner_bank_id
 msgid "Company bank account used for the presentation"
 msgstr ""
@@ -314,7 +319,6 @@ msgstr ""
 
 #. module: l10n_es_vat_book
 #: model:ir.model.fields,help:l10n_es_vat_book.field_l10n_es_vat_book__message_needaction
-#: model:ir.model.fields,help:l10n_es_vat_book.field_l10n_es_vat_book__message_unread
 msgid "If checked, new messages require your attention."
 msgstr ""
 
@@ -463,11 +467,6 @@ msgid "Messages"
 msgstr ""
 
 #. module: l10n_es_vat_book
-#: model:ir.model.fields,field_description:l10n_es_vat_book.field_l10n_es_vat_book__model_id
-msgid "Model"
-msgstr ""
-
-#. module: l10n_es_vat_book
 #: model:ir.model.fields,field_description:l10n_es_vat_book.field_l10n_es_vat_book__number
 msgid "Model number"
 msgstr ""
@@ -530,7 +529,7 @@ msgstr ""
 
 #. module: l10n_es_vat_book
 #: model:ir.model.fields,help:l10n_es_vat_book.field_l10n_es_vat_book__message_needaction_counter
-msgid "Number of messages which requires an action"
+msgid "Number of messages requiring action"
 msgstr ""
 
 #. module: l10n_es_vat_book
@@ -539,18 +538,8 @@ msgid "Number of messages with delivery error"
 msgstr ""
 
 #. module: l10n_es_vat_book
-#: model:ir.model.fields,help:l10n_es_vat_book.field_l10n_es_vat_book__message_unread_counter
-msgid "Number of unread messages"
-msgstr ""
-
-#. module: l10n_es_vat_book
 #: model:ir.model.fields,field_description:l10n_es_vat_book.field_l10n_es_vat_book__partner_id
 msgid "Partner"
-msgstr ""
-
-#. module: l10n_es_vat_book
-#: model_terms:ir.ui.view,arch_db:l10n_es_vat_book.vat_book_invoices_head
-msgid "Partner Name"
 msgstr ""
 
 #. module: l10n_es_vat_book
@@ -789,15 +778,17 @@ msgid ""
 msgstr ""
 
 #. module: l10n_es_vat_book
+#. odoo-python
 #: code:addons/l10n_es_vat_book/models/l10n_es_vat_book.py:0
 #, python-format
 msgid "This book has warnings. Fix it before confirm"
 msgstr ""
 
 #. module: l10n_es_vat_book
+#. odoo-python
 #: code:addons/l10n_es_vat_book/models/l10n_es_vat_book.py:0
 #, python-format
-msgid "This partner doesn't have VAT"
+msgid "This company doesn't have VAT"
 msgstr ""
 
 #. module: l10n_es_vat_book
@@ -828,16 +819,6 @@ msgstr ""
 #. module: l10n_es_vat_book
 #: model:ir.model.fields,field_description:l10n_es_vat_book.field_aeat_vat_book_map_line__fee_type_xlsx_column
 msgid "Type xlsx column"
-msgstr ""
-
-#. module: l10n_es_vat_book
-#: model:ir.model.fields,field_description:l10n_es_vat_book.field_l10n_es_vat_book__message_unread
-msgid "Unread Messages"
-msgstr ""
-
-#. module: l10n_es_vat_book
-#: model:ir.model.fields,field_description:l10n_es_vat_book.field_l10n_es_vat_book__message_unread_counter
-msgid "Unread Messages Counter"
 msgstr ""
 
 #. module: l10n_es_vat_book
@@ -915,12 +896,14 @@ msgid "Website communication history"
 msgstr ""
 
 #. module: l10n_es_vat_book
+#. odoo-python
 #: code:addons/l10n_es_vat_book/models/l10n_es_vat_book.py:0
 #, python-format
 msgid "Without Partner"
 msgstr ""
 
 #. module: l10n_es_vat_book
+#. odoo-python
 #: code:addons/l10n_es_vat_book/models/l10n_es_vat_book.py:0
 #, python-format
 msgid "Without VAT"

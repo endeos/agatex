@@ -132,6 +132,7 @@ msgid "Cancelled"
 msgstr "Abgebrochen"
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/account_banking_mandate.py:0
 #, python-format
 msgid ""
@@ -140,6 +141,7 @@ msgid ""
 msgstr ""
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/account_banking_mandate.py:0
 #, python-format
 msgid "Cannot validate the mandate '%s' without a date of signature."
@@ -272,7 +274,6 @@ msgstr ""
 
 #. module: account_banking_mandate
 #: model:ir.model.fields,help:account_banking_mandate.field_account_banking_mandate__message_needaction
-#: model:ir.model.fields,help:account_banking_mandate.field_account_banking_mandate__message_unread
 msgid "If checked, new messages require your attention."
 msgstr ""
 
@@ -332,18 +333,21 @@ msgid "Mandate Required"
 msgstr "Mandat erforderlich"
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/account_banking_mandate.py:0
 #, python-format
 msgid "Mandate should be in cancel state."
 msgstr "Mandate sollte im Abburchzustand sein."
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/account_banking_mandate.py:0
 #, python-format
 msgid "Mandate should be in draft or valid state."
 msgstr "Mandat sollte im Entwurfs- oder Gültigzustand sein."
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/account_banking_mandate.py:0
 #, python-format
 msgid "Mandate should be in draft state."
@@ -370,6 +374,7 @@ msgid "Messages"
 msgstr ""
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/account_payment_line.py:0
 #, python-format
 msgid "Missing Mandate on payment line %s"
@@ -415,19 +420,13 @@ msgstr "Anzahl der Mandate"
 
 #. module: account_banking_mandate
 #: model:ir.model.fields,help:account_banking_mandate.field_account_banking_mandate__message_needaction_counter
-msgid "Number of messages which requires an action"
+msgid "Number of messages requiring action"
 msgstr ""
 
 #. module: account_banking_mandate
 #: model:ir.model.fields,help:account_banking_mandate.field_account_banking_mandate__message_has_error_counter
 msgid "Number of messages with delivery error"
 msgstr ""
-
-#. module: account_banking_mandate
-#: model:ir.model.fields,help:account_banking_mandate.field_account_banking_mandate__message_unread_counter
-#, fuzzy
-msgid "Number of unread messages"
-msgstr "Anzahl der Mandate"
 
 #. module: account_banking_mandate
 #: model:ir.model.fields,help:account_banking_mandate.field_account_banking_mandate__state
@@ -459,6 +458,7 @@ msgid "Payment Methods"
 msgstr "Zahlungsmethoden"
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/account_banking_mandate.py:0
 #: model_terms:ir.ui.view,arch_db:account_banking_mandate.views_mandate_form_buttons
 #, fuzzy, python-format
@@ -526,12 +526,14 @@ msgid ""
 msgstr ""
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/account_banking_mandate.py:0
 #, python-format
 msgid "The date of signature of mandate '%s' is in the future!"
 msgstr ""
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/account_banking_mandate.py:0
 #, python-format
 msgid ""
@@ -540,6 +542,7 @@ msgid ""
 msgstr ""
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/account_payment_line.py:0
 #, python-format
 msgid ""
@@ -548,6 +551,7 @@ msgid ""
 msgstr ""
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/account_payment_line.py:0
 #, python-format
 msgid ""
@@ -579,16 +583,6 @@ msgid "Unique Mandate Reference"
 msgstr "Eindeutige Mandantenreferenz"
 
 #. module: account_banking_mandate
-#: model:ir.model.fields,field_description:account_banking_mandate.field_account_banking_mandate__message_unread
-msgid "Unread Messages"
-msgstr ""
-
-#. module: account_banking_mandate
-#: model:ir.model.fields,field_description:account_banking_mandate.field_account_banking_mandate__message_unread_counter
-msgid "Unread Messages Counter"
-msgstr ""
-
-#. module: account_banking_mandate
 #: model:ir.model.fields.selection,name:account_banking_mandate.selection__account_banking_mandate__state__valid
 #: model_terms:ir.ui.view,arch_db:account_banking_mandate.view_mandate_search
 msgid "Valid"
@@ -611,6 +605,7 @@ msgid "Website communication history"
 msgstr ""
 
 #. module: account_banking_mandate
+#. odoo-python
 #: code:addons/account_banking_mandate/models/res_partner_bank.py:0
 #, python-format
 msgid ""
@@ -630,6 +625,10 @@ msgstr ""
 
 #~ msgid "Mandate"
 #~ msgstr "Mandat"
+
+#, fuzzy
+#~ msgid "Number of unread messages"
+#~ msgstr "Anzahl der Mandate"
 
 #, fuzzy
 #~ msgid "Journal Entries"

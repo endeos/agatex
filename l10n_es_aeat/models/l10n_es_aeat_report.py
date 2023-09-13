@@ -67,7 +67,7 @@ class L10nEsAeatReport(models.AbstractModel):
         return self._aeat_number
 
     def _get_export_config(self, date):
-        model = self.env["ir.model"].search([("model", "=", self._name)])
+        model = self.env["ir.model"].sudo().search([("model", "=", self._name)])
         return self.env["aeat.model.export.config"].search(
             [
                 ("model_id", "=", model.id),
@@ -167,9 +167,6 @@ class L10nEsAeatReport(models.AbstractModel):
         tracking=True,
     )
     name = fields.Char(string="Report identifier", size=13, copy=False)
-    model_id = fields.Many2one(
-        comodel_name="ir.model", string="Model", compute="_compute_report_model"
-    )
     export_config_id = fields.Many2one(
         comodel_name="aeat.model.export.config",
         string="Export config",
@@ -177,7 +174,7 @@ class L10nEsAeatReport(models.AbstractModel):
             (
                 "model_id",
                 "=",
-                self.env["ir.model"].sudo().search([("model", "=", self._name)]).id,
+                self.env["ir.model"].search([("model", "=", self._name)]).id,
             )
         ],
         compute="_compute_export_config_id",
@@ -256,12 +253,6 @@ class L10nEsAeatReport(models.AbstractModel):
             "AEAT report identifier must be unique",
         )
     ]
-
-    def _compute_report_model(self):
-        for report in self:
-            report.model_id = (
-                self.env["ir.model"].search([("model", "=", report._name)]).id
-            )
 
     def _compute_allow_posting(self):
         for report in self:
@@ -378,11 +369,12 @@ class L10nEsAeatReport(models.AbstractModel):
             )
         return seq.next_by_id()
 
-    @api.model
-    def create(self, vals):
-        if not vals.get("name"):
-            vals["name"] = self._report_identifier_get(vals)
-        return super().create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if not vals.get("name"):
+                vals["name"] = self._report_identifier_get(vals)
+        return super().create(vals_list)
 
     def button_calculate(self):
         res = self.calculate()

@@ -125,6 +125,7 @@ msgid "No"
 msgstr "No"
 
 #. module: account_payment_partner
+#. odoo-python
 #: code:addons/account_payment_partner/tests/test_account_payment_partner.py:0
 #, python-format
 msgid "No Chart of Account Template has been defined !"
@@ -228,6 +229,7 @@ msgid ""
 msgstr ""
 
 #. module: account_payment_partner
+#. odoo-python
 #: code:addons/account_payment_partner/models/account_payment_mode.py:0
 #, python-format
 msgid ""
@@ -238,6 +240,7 @@ msgstr ""
 "modo de pago, ya asignado a otra empresa."
 
 #. module: account_payment_partner
+#. odoo-python
 #: code:addons/account_payment_partner/models/account_payment_mode.py:0
 #, python-format
 msgid ""
