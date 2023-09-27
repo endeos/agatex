@@ -94,3 +94,7 @@
 	path = OCA/server-backend
 	url = https://github.com/OCA/server-backend
 	branch = 16.0
+[submodule "OCA/account-reconcile"]
+	path = OCA/account-reconcile
+	url = https://github.com/OCA/account-reconcile
+	branch = 16.0
