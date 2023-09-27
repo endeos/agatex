@@ -1,0 +1,4 @@
+.vscode
+pyrightconfig.json
+__pycache__
+*.code-workspace
