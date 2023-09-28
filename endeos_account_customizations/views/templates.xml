@@ -1,0 +1,9 @@
+<odoo>
+    <data>
+        <template id="report_invoice_document" name="template_name" inherit_id="account.report_invoice_document">
+            <xpath expr="//div[@name='payment_term']" position="after">
+                <field name="payment_mode_id" />
+            </xpath>
+        </template>
+    </data>
+</odoo>
