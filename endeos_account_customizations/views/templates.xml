@@ -1,0 +1,10 @@
+<odoo>
+    <data>
+        <!-- Muestra el campo 'Modo de pago' debajo de la línea de 'Términos de pago' -->
+        <template id="report_invoice_document_endeos" name="Endeos report invoice document" inherit_id="account.report_invoice_document">
+            <xpath expr="//div[@name='payment_term']" position="after">
+                <p id="modo_de_pago" t-field="o.payment_mode_id"/>
+            </xpath>
+        </template>
+    </data>
+</odoo>
