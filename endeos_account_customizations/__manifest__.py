@@ -3,10 +3,10 @@
     'name': "Endeos - Account customizations",
 
     'summary': """
-        Personalización de la applicación de Contabilidad""",
+        Personalización de la aplicación de Contabilidad""",
 
     'description': """
-        Personalización de la applicación de Contabilidad
+        Personalización de la aplicación de Contabilidad
     """,
 
     # Categories https://github.com/odoo/odoo/blob/master/odoo/addons/base/data/ir_module_category_data.xml

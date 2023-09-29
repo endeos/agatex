@@ -1,6 +1,6 @@
 
 # ENDEOS Módulo personalizado
-Descripción del módulo.
+Personalización del módulo de Contabilidad
 
 # Configuration
 # Usage
@@ -10,3 +10,4 @@ Descripción del módulo.
 ## [1.0.0] - 2023-09-15
 ### Añadido
 - Lanzamiento versión inicial
+- Añade en el documento de factura el campo 'Modo de pago' debajo de la línea que muestra los 'Términos de pago'
