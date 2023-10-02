@@ -1,10 +1,49 @@
 <odoo>
     <data>
-        <!-- Muestra el campo 'Modo de pago' debajo de la línea de 'Términos de pago' -->
+        <template id="external_layout_boxed_endeos" name="Endeos external layout boxed" inherit_id="web.external_layout_boxed">
+            <!-- Reduce la altura del logo a 80px en los documentos -->
+            <xpath expr="//img[@t-if='company.logo']" position="attributes">
+               <attribute name="style" add="max-height:80px" />
+            </xpath>
+
+            <!-- Borde inferior más fino -->
+            <xpath expr="//div[@t-attf-class='footer o_boxed_footer o_company_#{company.id}_layout']" position="attributes">
+                <attribute name="style" add="border-top: 1px solid #e9ecef"/>
+            </xpath>
+
+            <!-- Elimina paginación en pdf -->
+            <!-- <xpath expr="//div[@t-if='report_type=="'pdf'"]" position="replace">
+            </xpath> -->
+
+        </template>
+
+        
         <template id="report_invoice_document_endeos" name="Endeos report invoice document" inherit_id="account.report_invoice_document">
+            <!-- Reduce el tamaño de fuente título Factura XXXXXX-->
+            <xpath expr="//h2" position="attributes">
+                <attribute name="style" add="font-size:22px" />
+            </xpath>
+
+            <!-- Elimina el campo 'Origen' -->
+            <xpath expr="//div[@name='origin']" position="replace">
+            </xpath>
+
+            <!-- Modifica 'Precio unitario' por 'Precio' -->
+            <xpath expr="//th[@name='th_priceunit']/span" position="replace">
+                <span>Precio</span>
+            </xpath>
+
+            <!-- Modifica ancho tabla 'Base imponible'-->
+            <xpath expr="//div[@id='total']/div" position="attributes">
+                <attribute name="t-attf-class" remove="#{'col-6' if report_type != 'html' else 'col-sm-7 col-md-6'} ms-auto" add="#{'col-3' if report_type != 'html' else 'col-sm-7 col-md-3'} ms-auto" />
+            </xpath>
+
+            <!-- Muestra el campo 'Modo de pago' debajo de la línea de 'Términos de pago' -->
             <xpath expr="//div[@name='payment_term']" position="after">
                 <p id="modo_de_pago" t-field="o.payment_mode_id"/>
             </xpath>
         </template>
+
     </data>
 </odoo>
+
