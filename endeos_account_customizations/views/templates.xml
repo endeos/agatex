@@ -25,8 +25,7 @@
             </xpath>
 
             <!-- Elimina el campo 'Origen' -->
-            <xpath expr="//div[@name='origin']" position="replace">
-            </xpath>
+            <xpath expr="//div[@name='origin']" position="replace" />
 
             <!-- Modifica 'Precio unitario' por 'Precio' -->
             <xpath expr="//th[@name='th_priceunit']/span" position="replace">
@@ -39,8 +38,26 @@
             </xpath>
 
             <!-- Muestra el campo 'Modo de pago' debajo de la línea de 'Términos de pago' -->
-            <xpath expr="//div[@name='payment_term']" position="after">
+            <!-- <xpath expr="//div[@name='payment_term']" position="after">
                 <p id="modo_de_pago" t-field="o.payment_mode_id"/>
+            </xpath> -->
+        </template>
+
+        <template id="report_invoice_document_endeos" name="Report invoice document Endeos" inherit_id="account_invoice_report_due_list.report_invoice_document">
+            <!-- Tamaño fuente tabla 'Vencimiento' -->
+            <xpath expr="//div[@t-if='due_list']//table" position="attributes">
+                <attribute name="style" add="font-size:12px" />
+            </xpath>
+
+            <!-- Elimina la columna 'Pendiente' de la tabla 'Vencimiento'-->
+            <xpath expr="//div[@t-if='due_list']//th[3]" position="replace" />
+            <xpath expr="//div[@t-if='due_list']//td[3]" position="replace" />
+        </template>
+
+        <!-- Tamaño fuente línea 'Cuenta bancaria' -->
+        <template id="report_invoice_payment_mode_endeos" name="Report invoice payment mode Endeos" inherit_id="account_payment_partner.report_invoice_payment_mode">
+            <xpath expr="//p[@t-foreach='o.partner_banks_to_show()']" position="attributes">
+                <attribute name="style" add="font-size:12px; margin-top:25px" />
             </xpath>
         </template>
 
