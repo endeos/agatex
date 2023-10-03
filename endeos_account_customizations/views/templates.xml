@@ -73,7 +73,6 @@
                 <attribute name="style" add="font-size:12px; margin-top:25px" />
             </xpath>
         </template>
-
     </data>
 </odoo>
 
