@@ -14,11 +14,9 @@
             <!-- Elimina paginación en pdf -->
             <xpath expr="//div[@t-if=&quot;report_type == 'pdf'&quot;]" position="replace">
             </xpath>
-
         </template>
 
-        
-        <template id="report_invoice_document_endeos" name="Endeos report invoice document" inherit_id="account.report_invoice_document">
+        <template id="report_invoice_document_endeos_account" name="Endeos report invoice document" inherit_id="account.report_invoice_document">
             <!-- Reduce el tamaño de fuente título Factura XXXXXX-->
             <xpath expr="//h2" position="attributes">
                 <attribute name="style" add="font-size:22px" />
@@ -43,7 +41,7 @@
             </xpath> -->
         </template>
 
-        <template id="report_invoice_document_endeos" name="Report invoice document Endeos" inherit_id="account_invoice_report_due_list.report_invoice_document">
+        <template id="report_invoice_document_endeos_report_due_list" name="Report invoice document Endeos" inherit_id="account_invoice_report_due_list.report_invoice_document">
             <!-- Tamaño fuente tabla 'Vencimiento' -->
             <xpath expr="//div[@t-if='due_list']//table" position="attributes">
                 <attribute name="style" add="font-size:12px" />
