@@ -41,7 +41,7 @@
             </xpath> -->
         </template>
 
-        <template id="report_invoice_document_endeos_report_duel_list" name="Report invoice document Endeos" inherit_id="account_invoice_report_due_list.report_invoice_document">
+        <template id="report_invoice_document_endeos_report_due_list" name="Report invoice document Endeos" inherit_id="account_invoice_report_due_list.report_invoice_document">
             <!-- Tamaño fuente tabla 'Vencimiento' -->
             <xpath expr="//div[@t-if='due_list']//table" position="attributes">
                 <attribute name="style" add="font-size:12px" />
@@ -58,6 +58,7 @@
                 <attribute name="style" add="font-size:12px; margin-top:25px" />
             </xpath>
         </template>
+
     </data>
 </odoo>
 
