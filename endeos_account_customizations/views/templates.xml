@@ -40,6 +40,11 @@
                 <span>Precio</span>
             </xpath>
 
+            <!-- Tamaño fuente tabla 'Total' -->
+            <xpath expr="//div[@id='total']" position="attributes">
+                <attribute name="style" add="font-size:12px" />
+            </xpath>
+
             <!-- Modifica ancho tabla 'Base imponible'-->
             <xpath expr="//div[@id='total']/div" position="attributes">
                 <attribute name="t-attf-class" remove="#{'col-6' if report_type != 'html' else 'col-sm-7 col-md-6'} ms-auto" add="#{'col-3' if report_type != 'html' else 'col-sm-7 col-md-3'} ms-auto" />
