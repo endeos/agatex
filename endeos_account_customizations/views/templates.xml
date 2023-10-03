@@ -6,6 +6,11 @@
                <attribute name="style" add="max-height:80px" />
             </xpath>
 
+            <!-- Reduce espacio cabecera  -->
+            <xpath expr="//t[@t-call='web.address_layout']/.." position="attributes">
+                <attribute name="class" remove="pt-5" add="pt-3" separator=" "/>
+            </xpath>
+
             <!-- Borde inferior más fino -->
             <xpath expr="//div[@t-attf-class='footer o_boxed_footer o_company_#{company.id}_layout']" position="attributes">
                 <attribute name="style" add="border-top: 1px solid #e9ecef"/>
@@ -16,10 +21,15 @@
             </xpath>
         </template>
 
-        <template id="report_invoice_document_endeos_account" name="Endeos report invoice document" inherit_id="account.report_invoice_document">
+        <template id="report_invoice_document_endeos_account" name="Endeos report invoice document account" inherit_id="account.report_invoice_document">
             <!-- Reduce el tamaño de fuente título Factura XXXXXX-->
             <xpath expr="//h2" position="attributes">
                 <attribute name="style" add="font-size:22px" />
+            </xpath>
+
+            <!-- Tamaño fuente tabla principal-->
+            <xpath expr="//table[@name='invoice_line_table']" position="attributes">
+                <attribute name="style" add="font-size:12px" />
             </xpath>
 
             <!-- Elimina el campo 'Origen' -->
@@ -41,7 +51,7 @@
             </xpath> -->
         </template>
 
-        <template id="report_invoice_document_endeos_report_due_list" name="Endeos Report invoice document" inherit_id="account_invoice_report_due_list.report_invoice_document">
+        <template id="report_invoice_document_endeos_report_due_list" name="Endeos Report invoice document due list" inherit_id="account_invoice_report_due_list.report_invoice_document">
             <!-- Tamaño fuente tabla 'Vencimiento' -->
             <xpath expr="//div[@t-if='due_list']//table" position="attributes">
                 <attribute name="style" add="font-size:12px" />
