@@ -3,7 +3,7 @@
         <template id="external_layout_boxed_endeos" name="Endeos external layout boxed" inherit_id="web.external_layout_boxed">
             <!-- Reduce la altura del logo a 80px en los documentos -->
             <xpath expr="//img[@t-if='company.logo']" position="attributes">
-               <attribute name="style" add="max-height:80px" />
+               <attribute name="style" add="max-height:60px" />
             </xpath>
 
             <!-- Reduce espacio cabecera  -->
