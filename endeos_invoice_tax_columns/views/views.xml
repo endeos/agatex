@@ -1,0 +1,40 @@
+<odoo>
+    <record id="view_invoice_tree_tax_columns" model="ir.ui.view">
+        <field name="name">Columnas de impuestos</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree" />
+
+        <field name="arch" type="xml">
+            
+            <xpath expr="//field[@name='amount_untaxed_signed']" position="after">
+                <field name="iva_21" optional="hide" sum="Total IVA 21" />
+                <field name="iva_10" optional="hide" sum="Total IVA 10" />
+                <field name="iva_4" optional="hide" sum="Total IVA 4" />
+
+                <field name="irpf_19" optional="hide" sum="Total IRPF 19" />
+                <field name="irpf_15" optional="hide" sum="Total IRPF 15" />
+                <field name="irpf_7" optional="hide" sum="Total IRPF 7" />
+                <field name="base_iva_21" optional="hide" sum="Total base IVA 21" />
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="view_invoice_form_tax_recalculate_button" model="ir.ui.view">
+        <field name="name">Botón para recalcular columnas impuestos</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form" />
+
+        <field name="arch" type="xml">
+            
+            <xpath expr="//header" position="inside">
+                <button 
+                    name="button_recalculate_tax_columns" 
+                    string="Recalcular columnas impuestos" 
+                    type="object"
+                    confirm="Se van a recalcular las columnas de impuestos de todas las facturas del año actual y el anterior." />
+            </xpath>
+
+        </field>
+    </record>
+</odoo>
