@@ -37,7 +37,7 @@ class EndeosRestApiXmlRpc(http.Controller):
         if not user_id:
             return False
         
-        request.uid = user_id
+        request.update_env(user=user_id)
         return True
     
     def map_xml_rpc_api_call(self):
