@@ -1,5 +1,5 @@
 from odoo import http, fields
-from odoo.http import request, db_monodb
+from odoo.http import request
 from ..controllers.api_helpers import prepare_response
 import logging
 import datetime
@@ -8,6 +8,8 @@ _logger = logging.getLogger(__name__)
 
 class EndeosRestApiAuth(http.Controller):    
     @http.route("/api/auth", auth="public", type="json", methods=["POST"])
+    # TODO check controller /web/session/authenticate -------------------------------------------------------------------------
+    # TODO update docs 
     def api_authenticate(self, **kw):
         """ return valid session ID
             :param db: database name
@@ -16,7 +18,7 @@ class EndeosRestApiAuth(http.Controller):
         """
         post_data = request.params
 
-        db_name = post_data.get("db", db_monodb())
+        db_name = post_data.get("db")
         request.session.authenticate(db_name, post_data.get("login"), post_data.get("password"))
         result = request.env["ir.http"].session_info()
 
