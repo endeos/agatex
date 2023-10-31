@@ -42,13 +42,13 @@ class EndeosRestApiAuth(http.Controller):
                 _logger.warning(f"set cookie session_id: {request.session.sid}")
             # result =  env['ir.http'].session_info()
             
-            response = prepare_response(data="check cookie session_id")
+            response = prepare_response(data=["check cookie session_id"])
             return response
     
-    @http.route("/api/logout", auth="user", type="json", methods=["GET"])
+    @http.route("/api/logout", auth="user", type="json")
     def api_logout(self, **kw):
         """ logout session
         """
-        request.session.logout(keep_db=True)
+        request.session.logout()
         response = prepare_response(data=["Logout complete"])
         return response
