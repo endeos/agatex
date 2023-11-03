@@ -1,5 +1,8 @@
 from typing import Union
 import logging
+import traceback
+import json
+import ast
 
 _logger = logging.getLogger(__name__)
 
@@ -11,19 +14,30 @@ def prepare_response(data=[], errors=[]):
 
         return res
 
-def search_records(model:object, domain:list, limit:Union[int,None]=None) -> Union[object,bool]:
-     recordset = model.search(domain, limit=limit)
-     if recordset:
-          return recordset
-     return False
+def search_records(model:object, domain:list, limit:Union[int,None]=None, context:dict={}, company:Union[int,None]=None) -> Union[object,bool]:
+    if context:
+        model = model.with_context(**context)
 
-def browse_records(model:object, rec_ids:Union[int,list]) -> Union[object,bool]:
+    if company:
+        model = model.with_company(company)
+
+    recordset = model.search(domain, limit=limit)
+    return recordset
+
+def browse_records(model:object, rec_ids:Union[int,list], context:dict={}) -> Union[object,bool]:
+    if context:
+        model = model.with_context(**context)
+
     recordset = model.browse(rec_ids).exists()
-    if recordset:
-        return recordset
-    return False
+    return recordset
 
-def create_record(model:object, data:dict) -> object:
+def create_record(model:object, data:dict, context:dict={}, company:Union[int,None]=None) -> object:
+    if context:
+        model = model.with_context(**context)
+
+    if company:
+        model = model.with_company(company)
+        
     new_record = model.create(data)
     return new_record
 
@@ -40,3 +54,59 @@ def delete_record(model: object, rec_id:int) -> bool:
           record.unlink()
           return True
      return False
+
+def dict_keys_lower(d:dict) -> dict:
+    res = dict()
+    for key in d.keys():
+        if isinstance(d[key], dict):
+            res[key.lower()] = dict_keys_lower(d[key])
+        else:
+            res[key.lower()] = d[key]
+    return res
+
+def deserialize_request_params_json(request:object) -> list:
+    raw_data = request.httprequest.data
+    errors = []
+
+    data = request.params
+    if not data:
+        # if there aren't request.params, try with json default deserialize first
+        try:
+            data = json.loads(raw_data.decode("utf-8"))
+            _logger.warning(f"Params: {data}")
+        except Exception as e:
+            errors.append(f"{e}")
+
+            _logger.error(f"{e}")
+            _logger.warning(f"deserialize_request_params_json | json.loads failed converting raw data. Trying again without decoding to utf8...")
+            pass
+    
+    # if default deserialize failed, try again withoud decoding raw data
+    if not data:
+        try:
+            data = json.loads(raw_data)
+            _logger.warning(f"Params: {data}")
+        except Exception as e:
+            errors.append(f"{e}")
+
+            _logger.error(f"{e}")
+            _logger.warning(f"deserialize_request_params_json | json.loads failed. Trying with literal eval...")
+            pass
+    
+    # if the above also failed, then try literal evaluation of the raw data
+    if not data:
+        try:
+            data = ast.literal_eval(raw_data.decode("utf-8"))
+            _logger.warning(f"Params: {data}")
+        except Exception as e:
+            errors.append(f"{e}")
+            
+            _logger.error(f"Raw data type: {type(raw_data)} Val: {raw_data}")
+            _logger.error(f"deserialize_request_params_json | Error decoding raw data to json | {e}")
+            _logger.error(traceback.format_exc())
+    
+    # lowercase all dictionary keys
+    if data and type(data) is dict:
+        data = dict_keys_lower(data)
+
+    return data.get("params"), errors
