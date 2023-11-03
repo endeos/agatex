@@ -37,9 +37,9 @@ class EndeosRestApiResPartner(http.Controller):
            return {"errors": [f"Required fields in sale_order_header: company_id, partner_id, partner_shipping_id"]}
         
         if lines and any(
-            not l.get("product_tmpl_id") or \
+            not l.get("product_template_id") or \
             not l.get("product_uom_qty") for l in lines):
-            return {"errors": [f"Required fields in sale_order_lines: product_tmpl_id, product_uom_qty"]}
+            return {"errors": [f"Required fields in sale_order_lines: product_template_id, product_uom_qty"]}
         
         # existing entities
         partner_model = request.env["res.partner"]
@@ -47,7 +47,7 @@ class EndeosRestApiResPartner(http.Controller):
         if not partner:
             return {"errors": [f"Partner with id {header.get('partner_id')} not found"]}
 
-        product_ids = list(map(lambda l: l.get("product_tmpl_id"), lines))
+        product_ids = list(map(lambda l: l.get("product_template_id"), lines))
         product_tmpl_model = request.env["product.template"]
         all_products = search_records(product_tmpl_model, domain=[], company=header.get("company_id"))
         if len(all_products.ids) < len(product_ids):
@@ -64,6 +64,7 @@ class EndeosRestApiResPartner(http.Controller):
     def _create_sale_order(self, header, lines):
         sale_order_model = request.env["sale.order"]
         partner_model = request.env["res.partner"]
+        product_tmpl_model = request.env["product.template"]
         partner = browse_records(partner_model, header.get("partner_id"))
 
         # header info
@@ -86,8 +87,11 @@ class EndeosRestApiResPartner(http.Controller):
         if lines:
             line_data = []
             for line in lines:
+                product_tmpl = browse_records(product_tmpl_model, line.get("product_template_id"))
+
                 tmp_line = (0, 0, {
-                    "product_tmpl_id": line.get("product_tmpl_id"),
+                    "product_template_id": product_tmpl.id,
+                    "product_id": product_tmpl.product_variant_id.id,
                     "product_uom_qty": line.get("product_uom_qty")
                 })
                 
@@ -129,33 +133,34 @@ class EndeosRestApiResPartner(http.Controller):
 
 
             :param (mandatory) | json body | sale_order_lines:list(dict)
-                                                product_tmpl_id:int
+                                                product_template_id:int
                                                 product_uom_qty:int
                                                 description (optional)
                                                 price_unit:float (optional)
                                                 discount:float (optional)
         """
-        _logger.info(f"rest_api_agatex_sale | k_create_sale_order | Begin")
-        _logger.info(f"rest_api_agatex_sale | k_create_sale_order | Request params: {request.params}")
-        _logger.info(f"rest_api_agatex_sale | k_create_sale_order | Request params raw: {request.httprequest.data}")
+        _logger.info(f"rest_api_agatex_sale | /api/v1/k/sale/create | Begin")
+        _logger.info(f"rest_api_agatex_sale | /api/v1/k/sale/create | Request params: {request.params}")
+        _logger.info(f"rest_api_agatex_sale | /api/v1/k/sale/create | Request params raw: {request.httprequest.data}")
 
         post_data, deserialize_errors = deserialize_request_params_json(request)
         if deserialize_errors and not post_data:
             response = prepare_response(errors=deserialize_errors)
             return response
 
-        validation = self._validate_input__k_create_sale_order(post_data)
+        validation = self._validate_input__create_sale_order(post_data)
         if validation.get("errors"):
             response = prepare_response(errors=validation.get("errors"))
-            _logger.info(f"rest_api_agatex_sale | k_create_sale_order | END | Errors: {validation.get('errors')}")
+            _logger.info(f"rest_api_agatex_sale | /api/v1/k/sale/create | END | Errors: {validation.get('errors')}")
             return response
         
         new_order = self._create_sale_order(post_data.get("sale_order_header"), post_data.get("sale_order_lines"))
-        # TODO check if it works via API and document
         # TODO pending info about intrastat codes
+        # TODO add logic to process picking validation
+        # TODO add logic to validate invoice
 
         response = prepare_response(data=new_order.name)
-        _logger.info(f"rest_api_agatex_sale | k_create_sale_order | END | Response: {response}")
+        _logger.info(f"rest_api_agatex_sale | /api/v1/k/sale/create | END | Response: {response}")
         return response
 
     

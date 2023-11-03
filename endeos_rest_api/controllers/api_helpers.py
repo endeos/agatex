@@ -109,4 +109,4 @@ def deserialize_request_params_json(request:object) -> list:
     if data and type(data) is dict:
         data = dict_keys_lower(data)
 
-    return data.get("params"), errors
+    return data.get("params") or data, errors
