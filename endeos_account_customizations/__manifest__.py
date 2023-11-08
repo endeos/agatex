@@ -11,7 +11,7 @@
 
     # Categories https://github.com/odoo/odoo/blob/master/odoo/addons/base/data/ir_module_category_data.xml
     'category': 'Accounting',
-    'version': '0.1',
+    'version': '1.1.0',
     'author': "ENDEOS S.L.",
     'website': "https://www.endeos.com",
     'license': 'Other proprietary',
@@ -21,6 +21,5 @@
     'data': [
         'views/templates.xml',
     ],
-
     
 }
