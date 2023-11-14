@@ -67,8 +67,8 @@ class AccountPaymentOrder(models.Model):
         if self.company_partner_bank_id and self.company_partner_bank_id.partner_id:
             extra_prefix += f"{self.company_partner_bank_id.partner_id.name}_"
         
-        if self.company_partner_bank_id and self.company_partner_bank_id.bank_id:
-            extra_prefix += f"{self.company_partner_bank_id.bank_id.code}_"
+        if self.company_partner_bank_id and self.company_partner_bank_id.acc_number:
+            extra_prefix += f"{self.company_partner_bank_id.acc_number[-4:]}_"
 
         gen_args = {
             "bic_xml_tag": bic_xml_tag,
