@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from lxml import etree
+
+from odoo import _, fields, models
+from odoo.exceptions import UserError
 
 class AccountPaymentOrder(models.Model):
     _inherit = "account.payment.order"
@@ -61,12 +64,12 @@ class AccountPaymentOrder(models.Model):
         xsd_file = self.payment_method_id.get_xsd_file_path()
         
         extra_prefix = ""
-        if self.company_partner_bank_id and self.company_partner_bank_id.bank_id and self.company_partner_bank_id.bank_id.partner_id:
-            extra_prefix += f"{self.company_partner_bank_id.bank_id.partner_id.name}_"
+        if self.company_partner_bank_id and self.company_partner_bank_id.partner_id:
+            extra_prefix += f"{self.company_partner_bank_id.partner_id.name}_"
         
         if self.company_partner_bank_id and self.company_partner_bank_id.bank_id:
             extra_prefix += f"{self.company_partner_bank_id.bank_id.code}_"
-            
+
         gen_args = {
             "bic_xml_tag": bic_xml_tag,
             "name_maxsize": name_maxsize,
