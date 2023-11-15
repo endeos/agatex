@@ -66,6 +66,9 @@ class AccountPaymentOrder(models.Model):
         extra_prefix = ""
         if self.company_partner_bank_id and self.company_partner_bank_id.partner_id:
             extra_prefix += f"{self.company_partner_bank_id.partner_id.name}_"
+
+        if self.journal_id:
+            extra_prefix += f"{self.journal_id.name}_"
         
         if self.company_partner_bank_id and self.company_partner_bank_id.acc_number:
             extra_prefix += f"{self.company_partner_bank_id.acc_number[-4:]}_"
