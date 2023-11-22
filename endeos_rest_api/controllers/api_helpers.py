@@ -105,8 +105,28 @@ def deserialize_request_params_json(request:object) -> list:
             _logger.error(f"deserialize_request_params_json | Error decoding raw data to json | {e}")
             _logger.error(traceback.format_exc())
     
-    # lowercase all dictionary keys
+    """ # lowercase all dictionary keys
     if data and type(data) is dict:
-        data = dict_keys_lower(data)
+        data = dict_keys_lower(data) """
 
     return data.get("params") or data, errors
+
+
+def validate_request_token(request):
+    env = request.env
+    post_data = request.params
+    if not post_data:
+        post_data, deserialize_errors = deserialize_request_params_json(request)
+
+    api_key = post_data.get("api_key", "")
+    ResUsersApiKeys = env["res.users.apikeys"]
+            
+    user_id = ResUsersApiKeys._check_credentials(scope="rpc", key=api_key)
+
+    _logger.warning(f"Validating user token: {api_key} | user_id: {user_id}")
+
+    if not user_id:
+        return False
+    
+    request.update_env(user=user_id)
+    return True
