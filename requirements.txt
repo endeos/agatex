@@ -2,3 +2,4 @@ fastapi
 python-multipart
 ujson
 parse-accept-language
+a2wsgi
