@@ -1,7 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter
-from fastapi.depends import Depends
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from odoo import api, fields, models
