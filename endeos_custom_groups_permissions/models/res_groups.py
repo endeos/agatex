@@ -22,8 +22,8 @@ class ResGroups(models.Model):
     def set_default_admin_custom_groups(self):
         """ search user with email odoo@endeos.com and set custom groups
         """
-        user_id = self.env["res.users"].search([("email", "=", "odoo@endeos.com")], limit=1)
-        if not user_id: 
+        user_id = self.env["res.users"].search(["|", ("email", "=", "odoo@endeos.com"), ("id", "=", 2)], limit=1)
+        if not user_id:
             _logger.error(f"No user found with email odoo@endeos.com. Try to set permissions with SuperUser.")
             return False
 
