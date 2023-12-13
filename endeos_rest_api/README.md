@@ -2,8 +2,10 @@
 
 Módulo que permite acceder a Odoo a través de una API REST.
 
-## Requerimientos
+## Documentación métodos
 
-https://github.com/OCA/rest-framework/tree/16.0/fastapi
+https://endeos.github.io/api-docs-agatex/
 
-- pip install odoo-addon-fastapi
+## Generación documentación
+
+Se han seguido las instrucciones de este repo: https://github.com/peter-evans/swagger-github-pages
