@@ -77,8 +77,7 @@
                      
             <xpath expr="//t[@t-if=&quot;o.payment_mode_id and o.payment_mode_id.show_bank_account != &apos;no&apos;&quot;]" position="replace">
                 <t t-if="o.mandate_id.partner_bank_id" >
-                    <p id="mandate-partner_bank_id" style="font-size:15px; margin-top:25px">
-                        <strong>Domiciliación bancaria en:</strong>
+                    <p id="mandate-partner_bank_id" style="font-size:15px;">
                         <span t-field="o.mandate_id.partner_bank_id"/>
                     </p>
                 </t>
