@@ -67,7 +67,6 @@
                 <attribute name="style" separator=";" add="font-size:12px; margin-bottom:24px" />
             </xpath>
 
-
             <!-- Elimina la columna 'Pendiente' de la tabla 'Vencimiento'-->
             <xpath expr="//div[@t-if='due_list']//th[3]" position="replace" />
             <xpath expr="//div[@t-if='due_list']//td[3]" position="replace" />
