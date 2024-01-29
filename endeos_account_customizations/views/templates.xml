@@ -64,7 +64,7 @@
         <template id="report_invoice_document_endeos_report_due_list" name="Endeos Report invoice document due list" inherit_id="account_invoice_report_due_list.report_invoice_document">
             <!-- Tamaño fuente tabla 'Vencimiento' -->
             <xpath expr="//div[@t-if='due_list']" position="attributes">
-                <attribute name="style" add="font-size:12px; margin-bottom:24px" />
+                <attribute name="style" separator=";" add="font-size:12px; margin-bottom:24px" />
             </xpath>
 
             <!-- Elimina la columna 'Pendiente' de la tabla 'Vencimiento'-->
