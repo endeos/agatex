@@ -72,11 +72,35 @@
             <xpath expr="//div[@t-if='due_list']//td[3]" position="replace" />
         </template>
 
-        <!-- Tamaño fuente línea 'Cuenta bancaria' -->
+        <!-- Añade la cuenta bancaria del cliente si el pago se le domicilia, en caso de transferencia, se muestra nuestro número de 'Cuenta bancaria' -->
         <template id="report_invoice_payment_mode_endeos" name="Endeos Report invoice payment mode" inherit_id="account_payment_partner.report_invoice_payment_mode">
-            <xpath expr="//p[@t-foreach='o.partner_banks_to_show()']" position="attributes">
-                <attribute name="style" add="font-size:15px; margin-top:25px" />
+                     
+            <xpath expr="//t[@t-if=&quot;o.payment_mode_id and o.payment_mode_id.show_bank_account != &apos;no&apos;&quot;]" position="replace">
+                <t t-if="o.mandate_id.partner_bank_id" >
+                    <p id="mandate-partner_bank_id" style="font-size:15px; margin-top:25px">
+                        <strong>Domiciliación bancaria en:</strong>
+                        <span t-field="o.mandate_id.partner_bank_id"/>
+                    </p>
+                </t>
+                <t t-else="o.payment_mode_id and o.payment_mode_id.show_bank_account != 'no'">
+                    <p t-foreach="o.partner_banks_to_show()" t-as="partner_bank" style="font-size:15px; margin-top:25px">
+                        <strong>Cuenta bancaria:</strong>
+                        <t t-if="partner_bank.bank_id">
+                            <t t-esc="partner_bank.bank_id.name + ('' if not partner_bank.bank_id.bic else ' (' + partner_bank.bank_id.bic + ')')"/>
+                        </t>
+                        <t t-if="o.payment_mode_id.show_bank_account == 'full'">
+                            <span t-field="partner_bank.acc_number"/>
+                        </t>
+                        <t t-elif="o.payment_mode_id.show_bank_account == 'first'">
+                            <span t-esc="partner_bank.acc_number[:o.payment_mode_id.show_bank_account_chars] + '*' * (len(partner_bank.acc_number) - o.payment_mode_id.show_bank_account_chars)"/>
+                        </t>
+                        <t t-elif="o.payment_mode_id.show_bank_account == 'last'">
+                            <span t-esc="'*' * (len(partner_bank.acc_number) - o.payment_mode_id.show_bank_account_chars) + partner_bank.acc_number[-o.payment_mode_id.show_bank_account_chars:]"/>
+                        </t>
+                    </p>
+                </t>
             </xpath>
+
         </template>
 
         <template id="address_layout_endeos" name="Endeos Address layout" inherit_id="web.address_layout">
@@ -90,3 +114,4 @@
     </data>
 </odoo>
 
+ 
