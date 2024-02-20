@@ -1,4 +1,4 @@
-from odoo import http
+from odoo import http, Command
 from odoo.http import request
 from datetime import datetime
 from ..controllers.api_helpers import prepare_response, create_record, update_record, delete_record, browse_records, search_records, deserialize_request_params_json, validate_request_token
@@ -12,25 +12,28 @@ class EndeosRestApiResPartner(http.Controller):
     @http.route("/api/v1/k/sale/create", auth="public", type="json", methods=["POST"])
     def k_create_sale_order(self, **kw):
         """ return sale order name just created
-            :param (mandatory) | json body | sale_order_header:dict
-                                                company_id:int
-                                                partner_id:int
-                                                partner_shipping_id:int
-                                                date_order:char format YYYY-mm-dd HH:MM:SS (optional default now)
-                                                payment_mode_id:int (optional default customers's mode or 'TRANSFERENCIA')
-                                                payment_term_id:int (optional default customers's term or 'CONTADO')
-                                                client_order_ref:char (optional)
-                                                validate_picking:bool (optional default False)
-                                                validate_invoice:bool (optional default False)
-                                                agent_id:int (optional)
-
-
-            :param (mandatory) | json body | sale_order_lines:list(dict)
-                                                product_template_id:int
-                                                product_uom_qty:int
-                                                description (optional)
-                                                price_unit:float (optional)
-                                                discount:float (optional)
+            :param (mandatory) | json body | CompanyId:int
+            :param (mandatory) | json body | ExternalCustomerId:str
+            :param (mandatory) | json body | ExternalCustomerNIF:str
+            :param (optional) | json body | ExternalCustomerName:str
+            :param (mandatory) | json body | FacturaFecha:str in format YYYY-MM-ddThh:mm:ss
+            :param (mandatory) | json body | Incoterm:str
+            :param (mandatory) | json body | IncotermUbicacion:str
+            :param (mandatory) | json body | IncotrastatTransportCode:str
+            :param (mandatory) | json body | Albaranes:str
+            :param (mandatory) | json body | lineas:list
+                                                IsSeparator:bool (mandatory)
+                                                IsTextNote:bool (mandatory)
+                                                ProductId:str
+                                                ProductDescription:str (mandatory)
+                                                ProductoUoM:str
+                                                ProductoPrecio:float
+                                                Descuento:float
+                                                AlbaranExternoId:str
+                                                AlbaranExternoLinea:str
+                                                PedidoExternoId:str
+                                                PedidoExternoLinea:str
+                                                PedidoExternoLinea        
         """
         _logger.info(f"rest_api_agatex_sale | /api/v1/k/sale/create | Begin")
         _logger.info(f"rest_api_agatex_sale | /api/v1/k/sale/create | Request params: {request.params}")
@@ -52,10 +55,19 @@ class EndeosRestApiResPartner(http.Controller):
             _logger.info(f"rest_api_agatex_sale | /api/v1/k/sale/create | END | Errors: {validation.get('errors')}")
             return response
         
-        new_order = self._create_sale_order(post_data.get("sale_order_header"), post_data.get("sale_order_lines"))
-        # TODO pending info about intrastat codes
-        # TODO add logic to process picking validation
-        # TODO add logic to validate invoice
+        header = {
+            "CompanyId": post_data.get("CompanyId"),
+            "ExternalCustomerId": post_data.get("ExternalCustomerId"),
+            "ExternalCustomerNIF": post_data.get("ExternalCustomerNIF"),
+            "ExternalCustomerName": post_data.get("ExternalCustomerName"),
+            "FacturaFecha": post_data.get("FacturaFecha"),
+            "Incoterm": post_data.get("Incoterm"),
+            "IncotermUbicacion": post_data.get("IncotermUbicacion"),
+            "IncotrastatTransportCode": post_data.get("IncotrastatTransportCode"),
+            "Albaranes": post_data.get("Albaranes")
+        }
+        lines = post_data.get("lineas")
+        new_order = self._create_sale_order(header, lines)
 
         response = prepare_response(data=new_order.name)
         _logger.info(f"rest_api_agatex_sale | /api/v1/k/sale/create | END | Response: {response}")
@@ -128,38 +140,47 @@ class EndeosRestApiResPartner(http.Controller):
             - shipping id same as/child of partner
         """
         # required fields
-        if not post_data.get("sale_order_header") or post_data.get("sale_order_lines") is None:
-            return {"errors": [f"Required fields: sale_order_header, sale_order_line"]}
+        if not post_data.get("CompanyId") \
+        or not post_data.get("ExternalCustomerId") \
+        or not post_data.get("ExternalCustomerNIF") \
+        or not post_data.get("ExternalCustomerName") \
+        or not post_data.get("FacturaFecha") \
+        or not post_data.get("Incoterm") \
+        or not post_data.get("IncotermUbicacion") \
+        or not post_data.get("IncotrastatTransportCode") \
+        or post_data.get("lineas") is None:
+            return {"errors": [f"Missing some required field: CompanyId, ExternalCustomerId, ExternalCustomerNIF, ExternalCustomerName, FacturaFecha, Incoterm, IncotermUbicacion, IncotrastatTransportCode, lineas"]}
         
-        header = post_data.get("sale_order_header")
-        lines = post_data.get("sale_order_lines")
-
-        if not header.get("company_id") or \
-           not header.get("partner_id") or \
-           not header.get("partner_shipping_id"):
-           return {"errors": [f"Required fields in sale_order_header: company_id, partner_id, partner_shipping_id"]}
+        lines = post_data.get("lineas")
         
         if lines and any(
-            not l.get("product_template_id") or \
-            not l.get("product_uom_qty") for l in lines):
-            return {"errors": [f"Required fields in sale_order_lines: product_template_id, product_uom_qty"]}
+            not l.get("ProductoDescripcion") or \
+            (not l.get("IsSeparator") and not l.get("IsTextNote") and not l.get("ProductoId")) for l in lines):
+            return {"errors": [f"Required fields in sale lines: IsSeparator/IsTextNote/ProductoId, ProductoDescripcion"]}
         
-        # existing entities
+        # existing partner
         partner_model = request.env["res.partner"]
-        partner = browse_records(partner_model, header.get("partner_id"))
-        if not partner:
-            return {"errors": [f"Partner with id {header.get('partner_id')} not found"]}
+        vat = post_data.get("ExternalCustomerNIF")
+        name = post_data.get("ExternalCustomerName")
+        company_id = post_data.get("CompanyId")
+        domain = ["|", ("vat", "=", vat), ("name", "=", name)]
+        partner = search_records(partner_model, domain, limit=1, company=company_id)
 
-        product_ids = list(map(lambda l: l.get("product_template_id"), lines))
-        product_tmpl_model = request.env["product.template"]
-        all_products = search_records(product_tmpl_model, domain=[], company=header.get("company_id"))
-        if len(all_products.ids) < len(product_ids):
-            return {"errors": [f"Check given product ids given in lines, some of them may not exist in Odoo in company with id {header.get('company_id')}"]}
-        
-        # shipping address belongs to partner
-        if partner.id != header.get("partner_shipping_id"):
-            if header.get("partner_shipping_id") not in partner.child_ids.ids:
-                return {"errors": [f"Given shipping address does not belong to partner {partner.name}"]}                
+        if not partner:
+            return {"errors": [f"Partner not found with vat {vat} or name {name} in company with id {company_id}"]}
+
+        # existing products
+        product_lines = list(filter(lambda l: l.get("ProductoId"), lines))
+        product_model = request.env["product.template"]
+        product_refs = list(set(map(lambda l: l["ProductoId"], product_lines)))
+
+        product_errors = []
+        for r in product_refs:
+            domain = [("default_code", "=", r)]
+            product = search_records(product_model, domain, limit=1, company=company_id)
+            if not product: product_errors.append(f"Product with ref {r} not found")
+        if product_errors:
+            return {"errors": product_errors}              
         
         return {"errors": []}
     
@@ -225,50 +246,66 @@ class EndeosRestApiResPartner(http.Controller):
         sale_order_model = request.env["sale.order"]
         partner_model = request.env["res.partner"]
         product_tmpl_model = request.env["product.template"]
-        partner = browse_records(partner_model, header.get("partner_id"))
+
+        vat = header.get("ExternalCustomerNIF")
+        name = header.get("ExternalCustomerName")
+        company_id = header.get("CompanyId")
+        domain = ["|", ("vat", "=", vat), ("name", "=", name)]
+        partner = search_records(partner_model, domain, limit=1, company=company_id)
 
         # header info
         data = {
             "partner_id": partner.id,
-            "partner_shipping_id": header.get("partner_shipping_id"),
-            "client_order_ref": header.get("client_order_ref")
+            # "partner_shipping_id": header.get("partner_shipping_id"),
+            # "client_order_ref": header.get("client_order_ref")
+            "state": "draft",
+            "incoterm": header.get("Incoterm"),
+            "incoterm_location": header.get("IncotermUbicacion")
         }
 
-        data["state"] = "sale" if header.get("validate_picking") == True or header.get("validate_picking") == True else "draft"
-
         date_format = "%Y-%m-%d %H:%M:%S"
-        data["date_order"] = datetime.strptime(header.get("date_order"), date_format) if header.get("date_order") else datetime.now()
+        data["date_order"] = datetime.strptime(header.get("FacturaFecha"), date_format) if header.get("FacturaFecha") else datetime.now()
 
-        data["payment_mode_id"] = header.get("payment_mode_id") or (partner.customer_payment_mode_id and partner.customer_payment_mode_id.id) or False
-        data["payment_term_id"] = header.get("payment_term_id") or (partner.property_payment_term_id and partner.property_payment_term_id.id) or False
+        data["payment_mode_id"] = (partner.customer_payment_mode_id and partner.customer_payment_mode_id.id) or False
+        data["payment_term_id"] = (partner.property_payment_term_id and partner.property_payment_term_id.id) or False
         data["pricelist_id"] = partner.property_product_pricelist and partner.property_product_pricelist.id or False
+
 
         # lines info
         if lines:
             line_data = []
             for line in lines:
-                product_tmpl = browse_records(product_tmpl_model, line.get("product_template_id"))
 
-                tmp_line = (0, 0, {
-                    "product_template_id": product_tmpl.id,
-                    "product_id": product_tmpl.product_variant_id.id,
-                    "product_uom_qty": line.get("product_uom_qty")
-                })
+                product_tmpl = False
+                if line.get("ProductoId"):
+                    domain = [("default_code", "=", line.get("ProductoId"))]
+                    product_tmpl = search_records(product_tmpl_model, domain, limit=1, company=company_id)
                 
-                if line.get("description"):
-                    tmp_line[2]["name"] = line.get("description")
+                tmp_line = {
+                    "name": line.get("ProductoDescripcion")
+                }
+                if product_tmpl:
+                    tmp_line["product_template_id"] = product_tmpl.id
+                    tmp_line["product_id"] = product_tmpl.product_variant_id.id
+                    tmp_line["product_uom_qty"] = line.get("ProductoCantidad")
                 
-                if line.get("price_unit"):
-                    tmp_line[2]["price_unit"] = line.get("price_unit")
+                if line.get("IsSeparator"):
+                    tmp_line["display_type"] = "line_section"
                 
-                if line.get("discount"):
-                    tmp_line[2]["discount"] = line.get("discount")          
+                if line.get("isTextNote"):
+                    tmp_line["display_type"] = "line_note"
+                
+                if line.get("ProductoPrecio"):
+                    tmp_line["price_unit"] = line.get("ProductoPrecio")
+                
+                if line.get("Descuento"):
+                    tmp_line["discount"] = line.get("Descuento")
 
-                line_data.append(tmp_line)
+                line_data.append(Command.create(tmp_line))
 
-            data["order_line"] = line_data
+            data["order_line"] = line_data 
 
-        new_record = create_record(sale_order_model, data, company=header.get("company_id"))
+        new_record = create_record(sale_order_model, data, company=company_id)
         new_record.message_post(body=f"Creado desde API")
         return new_record
 
