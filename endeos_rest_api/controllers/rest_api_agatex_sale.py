@@ -69,6 +69,9 @@ class EndeosRestApiResPartner(http.Controller):
         lines = post_data.get("lineas")
         new_order = self._create_sale_order(header, lines)
 
+        new_order.action_confirm()
+        invoices = new_order._create_invoices(final=True)
+
         response = prepare_response(data=new_order.name)
         _logger.info(f"rest_api_agatex_sale | /api/v1/k/sale/create | END | Response: {response}")
         return response
@@ -169,6 +172,15 @@ class EndeosRestApiResPartner(http.Controller):
         if not partner:
             return {"errors": [f"Partner not found with vat {vat} or name {name} in company with id {company_id}"]}
 
+        # existing incoterm
+        incoterm_model = request.env["account.incoterms"]
+        code = post_data.get("Incoterm")
+        domain = []
+        incoterm = search_records(incoterm_model, domain).filtered(lambda i: i.code == code)
+        
+        if not incoterm:
+            return {"errors": [f"Incoterm not found with code {code}"]}
+
         # existing products
         product_lines = list(filter(lambda l: l.get("ProductoId"), lines))
         product_model = request.env["product.template"]
@@ -245,6 +257,7 @@ class EndeosRestApiResPartner(http.Controller):
     def _create_sale_order(self, header, lines):
         sale_order_model = request.env["sale.order"]
         partner_model = request.env["res.partner"]
+        incoterm_model = request.env["account.incoterms"]
         product_tmpl_model = request.env["product.template"]
 
         vat = header.get("ExternalCustomerNIF")
@@ -253,14 +266,19 @@ class EndeosRestApiResPartner(http.Controller):
         domain = ["|", ("vat", "=", vat), ("name", "=", name)]
         partner = search_records(partner_model, domain, limit=1, company=company_id)
 
+        code = header.get("Incoterm")
+        domain = []
+        incoterm = search_records(incoterm_model, domain).filtered(lambda i: i.code == code)
+
         # header info
         data = {
             "partner_id": partner.id,
             # "partner_shipping_id": header.get("partner_shipping_id"),
             # "client_order_ref": header.get("client_order_ref")
             "state": "draft",
-            "incoterm": header.get("Incoterm"),
-            "incoterm_location": header.get("IncotermUbicacion")
+            "incoterm": incoterm.id,
+            "incoterm_location": header.get("IncotermUbicacion"),
+            "origin": f"Albaranes: {header.get('Albaranes')}"
         }
 
         date_format = "%Y-%m-%d %H:%M:%S"
@@ -290,9 +308,11 @@ class EndeosRestApiResPartner(http.Controller):
                     tmp_line["product_uom_qty"] = line.get("ProductoCantidad")
                 
                 if line.get("IsSeparator"):
+                    if tmp_line.get("product_id"): del tmp_line["product_id"]
                     tmp_line["display_type"] = "line_section"
                 
-                if line.get("isTextNote"):
+                if line.get("IsTextNote"):
+                    if tmp_line.get("product_id"): del tmp_line["product_id"]
                     tmp_line["display_type"] = "line_note"
                 
                 if line.get("ProductoPrecio"):
