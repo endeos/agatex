@@ -32,8 +32,7 @@ class EndeosRestApiResPartner(http.Controller):
                                                 AlbaranExternoId:str
                                                 AlbaranExternoLinea:str
                                                 PedidoExternoId:str
-                                                PedidoExternoLinea:str
-                                                PedidoExternoLinea        
+                                                PedidoExternoLinea:str     
         """
         _logger.info(f"rest_api_agatex_sale | /api/v1/k/sale/create | Begin")
         _logger.info(f"rest_api_agatex_sale | /api/v1/k/sale/create | Request params: {request.params}")
