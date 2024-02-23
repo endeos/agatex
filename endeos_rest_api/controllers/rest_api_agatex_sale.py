@@ -25,6 +25,8 @@ class EndeosRestApiResPartner(http.Controller):
                                                 IsSeparator:bool (mandatory)
                                                 IsTextNote:bool (mandatory)
                                                 ProductId:str
+                                                ProductoCantidad:float (mandatory)
+                                                ProductoCantidadEntregada:float (optional)
                                                 ProductDescription:str (mandatory)
                                                 ProductoUoM:str
                                                 ProductoPrecio:float
@@ -32,8 +34,7 @@ class EndeosRestApiResPartner(http.Controller):
                                                 AlbaranExternoId:str
                                                 AlbaranExternoLinea:str
                                                 PedidoExternoId:str
-                                                PedidoExternoLinea:str
-                                                PedidoExternoLinea        
+                                                PedidoExternoLinea:str     
         """
         _logger.info(f"rest_api_agatex_sale | /api/v1/k/sale/create | Begin")
         _logger.info(f"rest_api_agatex_sale | /api/v1/k/sale/create | Request params: {request.params}")
@@ -307,6 +308,9 @@ class EndeosRestApiResPartner(http.Controller):
                     tmp_line["product_id"] = product_tmpl.product_variant_id.id
                     tmp_line["product_uom_qty"] = line.get("ProductoCantidad")
                 
+                if line.get("ProductoCantidadEntregada"):
+                    tmp_line["qty_delivered"] = line.get("ProductoCantidadEntregada")
+
                 if line.get("IsSeparator"):
                     if tmp_line.get("product_id"): del tmp_line["product_id"]
                     tmp_line["display_type"] = "line_section"
