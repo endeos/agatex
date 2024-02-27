@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="endeos_view_move_form_customizations" model="ir.ui.view">
+        <field name="name">Endeos customizations</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form" />
+
+        <field name="arch" type="xml">
+            
+            <xpath expr="//notebook//page[@name='other_info']//group[@name='sale_info_group']" position="inside">
+                <field name="x_sale_incoterm_location" />
+                <field name="x_sale_incotrastat_transport_code" />
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

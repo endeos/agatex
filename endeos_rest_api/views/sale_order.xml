@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="endeos_view_order_form_customizations" model="ir.ui.view">
+        <field name="name">Endeos customizations</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form" />
+
+        <field name="arch" type="xml">
+            
+            <xpath expr="//notebook//page[@name='other_information']//group[@name='sale_shipping']" position="inside">
+                <field name="x_incotrastat_transport_code" />
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

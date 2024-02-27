@@ -13,6 +13,7 @@ class EndeosRestApiResPartner(http.Controller):
     def k_create_sale_order(self, **kw):
         """ return sale order name just created
             :param (mandatory) | json body | CompanyId:int
+            :param (mandatory) | json body | ExternalId:str
             :param (mandatory) | json body | ExternalCustomerId:str
             :param (mandatory) | json body | ExternalCustomerNIF:str
             :param (optional) | json body | ExternalCustomerName:str
@@ -58,6 +59,7 @@ class EndeosRestApiResPartner(http.Controller):
         
         header = {
             "CompanyId": post_data.get("CompanyId"),
+            "ExternalId": post_data.get("ExternalId"),
             "ExternalCustomerId": post_data.get("ExternalCustomerId"),
             "ExternalCustomerNIF": post_data.get("ExternalCustomerNIF"),
             "ExternalCustomerName": post_data.get("ExternalCustomerName"),
@@ -72,6 +74,10 @@ class EndeosRestApiResPartner(http.Controller):
 
         new_order.action_confirm()
         invoices = new_order._create_invoices(final=True)
+        invoices.write({
+            "x_sale_incoterm_location": new_order.incoterm_location,
+            "x_sale_incotrastat_transport_code": new_order.x_incotrastat_transport_code
+        })
 
         response = prepare_response(data=new_order.name)
         _logger.info(f"rest_api_agatex_sale | /api/v1/k/sale/create | END | Response: {response}")
@@ -263,6 +269,7 @@ class EndeosRestApiResPartner(http.Controller):
 
         vat = header.get("ExternalCustomerNIF")
         name = header.get("ExternalCustomerName")
+        client_ref = header.get("ExternalId")
         company_id = header.get("CompanyId")
         domain = ["|", ("vat", "=", vat), ("name", "=", name)]
         partner = search_records(partner_model, domain, limit=1, company=company_id)
@@ -274,12 +281,14 @@ class EndeosRestApiResPartner(http.Controller):
         # header info
         data = {
             "partner_id": partner.id,
+            "client_order_ref": client_ref,
             # "partner_shipping_id": header.get("partner_shipping_id"),
             # "client_order_ref": header.get("client_order_ref")
             "state": "draft",
             "incoterm": incoterm.id,
             "incoterm_location": header.get("IncotermUbicacion"),
-            "origin": f"Albaranes: {header.get('Albaranes')}"
+            "origin": header.get('Albaranes'),
+            "x_incotrastat_transport_code": header.get("IncotrastatTransportCode")
         }
 
         date_format = "%Y-%m-%d %H:%M:%S"
