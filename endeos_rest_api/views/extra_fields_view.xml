@@ -5,9 +5,12 @@
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase.purchase_order_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='currency_id']" position="after">
+                <field name="x_n_albaran" />
+            </xpath>
             <xpath expr="//field[@name='price_tax']" position="after">
-                <field name="color" />
-                <field name="lote" />
+                <field name="x_color" />
+                <field name="x_lote" />
             </xpath>
         </field>
     </record>
