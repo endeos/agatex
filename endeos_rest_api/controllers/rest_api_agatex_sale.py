@@ -555,7 +555,7 @@ class EndeosRestApiResPartner(http.Controller):
             # "client_order_ref": header.get("client_order_ref")
             "state": "purchase",
             "origin": f"Albaranes: {header.get('Albaranes')}",
-            "x_studio_nallbaran": header.get('ExternalId')
+            "x_n_albaran": header.get('ExternalId')
         }
         _logger.info(f"| END | data: {data}")
         date_format = "%Y-%m-%d %H:%M:%S"
@@ -602,10 +602,10 @@ class EndeosRestApiResPartner(http.Controller):
                     tmp_line["discount"] = line.get("Descuento") or False
                     
                 if line.get("Lote"):
-                    tmp_line["lote"] = line.get("Lote") or False
+                    tmp_line["x_lote"] = line.get("Lote") or False
                     
                 if line.get("ProductoVariante"):
-                    tmp_line["color"] = line.get("ProductoVariante") or False
+                    tmp_line["x_color"] = line.get("ProductoVariante") or False
                 
                 if line.get("qty_received"):
                     tmp_line["qty_received"] = line.get("ProductoCantidadEntregada")   
