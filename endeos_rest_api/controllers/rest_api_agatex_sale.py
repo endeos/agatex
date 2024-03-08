@@ -419,7 +419,7 @@ class EndeosRestApiResPartner(http.Controller):
                                                 ProductVariante:str ESTA
                                                 Lote:str ESTA
                                                 ProductoCantidad:float (mandatory) esta
-                                                ProductoCantidadEntregada:float (optional) esta
+                                                ProductoCantidadEntregada:float (optional) esta, pero no pilla el valor
                                                 ProductoUoM:str esta
                                                 ProductoPrecio:float esta
                                                 Descuento:float esta
@@ -583,8 +583,7 @@ class EndeosRestApiResPartner(http.Controller):
                 if product_tmpl:
                     #tmp_line["product_template_id"] = product_tmpl.id
                     tmp_line["product_id"] = product_tmpl.product_variant_id.id
-                    tmp_line["product_qty"] = line.get("ProductoCantidad")
-                    tmp_line["qty_received"] = line.get("ProductoCantidadEntregada")
+                    tmp_line["product_qty"] = line.get("ProductoCantidad") or 0.0
                 #if line.get("ProductoCantidadEntregada"):
                     #tmp_line["qty_delivered"] = line.get("ProductoCantidadEntregada") or False
     
@@ -606,8 +605,10 @@ class EndeosRestApiResPartner(http.Controller):
                     tmp_line["lote"] = line.get("Lote") or False
                     
                 if line.get("ProductoVariante"):
-                    tmp_line["color"] = line.get("ProductoVariante") or False     
-                _logger.warning(f"linea de orden {tmp_line}") 
+                    tmp_line["color"] = line.get("ProductoVariante") or False
+                
+                if line.get("qty_received"):
+                    tmp_line["qty_received"] = line.get("ProductoCantidadEntregada")   
                 
                 line_data.append(Command.create(tmp_line))
                     
