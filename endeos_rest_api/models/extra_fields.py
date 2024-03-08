@@ -10,16 +10,13 @@ _logger = logging.getLogger(__name__)
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
     
-    color = fields.Text(
+    color = fields.Char(
         string='Color',
         store=True
     )
     
-    lote = fields.Text(
+    lote = fields.Char(
         string='Lote',
         store=True
     )
-    
-    
-    
-            
+       
