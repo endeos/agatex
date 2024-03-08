@@ -605,8 +605,8 @@ class EndeosRestApiResPartner(http.Controller):
                 if line.get("Lote"):
                     tmp_line["lote"] = line.get("Lote") or False
                     
-                if line.get("ProductVariante"):
-                    tmp_line["color"] = line.get("ProductVariante") or False     
+                if line.get("ProductoVariante"):
+                    tmp_line["color"] = line.get("ProductoVariante") or False     
                 _logger.warning(f"linea de orden {tmp_line}") 
                 
                 line_data.append(Command.create(tmp_line))
