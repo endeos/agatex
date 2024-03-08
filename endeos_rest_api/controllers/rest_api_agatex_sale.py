@@ -607,7 +607,7 @@ class EndeosRestApiResPartner(http.Controller):
                 if line.get("ProductoVariante"):
                     tmp_line["x_color"] = line.get("ProductoVariante") or False
                 
-                if line.get("qty_received"):
+                if line.get("ProductoCantidadEntregada"):
                     tmp_line["qty_received"] = line.get("ProductoCantidadEntregada")   
                 
                 tmp_line["product_qty"] = line.get("ProductoCantidad") or 0.0
