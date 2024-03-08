@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Heredar la vista form de órdenes de compra y añadir campos -->
+        <record id="view_purchase_order_form_inherit_extra_fields" model="ir.ui.view">
+            <field name="name">purchase.order.form.inherit</field>
+            <field name="model">purchase.order.line</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='price_tax']" position="after">
+                    <!-- Agregar aquí los campos nuevos -->
+                    <field name="color" />
+                    <field name="lote" />
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

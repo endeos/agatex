@@ -399,3 +399,228 @@ class EndeosRestApiResPartner(http.Controller):
         
         return new_record
         
+#Recibe json de la API, agrupa datos, llama a validar, y llama a crear orden de comrpa
+    @http.route("/api/v1/k/purchase/create", auth="public", type="json", methods=["POST"])
+    def k_create_purchase_order(self, **kw):
+        """ return sale order name just created
+            :param (mandatory) | json body | CompanyId:int esta
+            :param (mandatory) | json body | Id:str esta
+            :param (mandatory) | json body | ExternalId:str esta
+            :param (mandatory) | json body | ExternalVendorrId:str esta
+            :param (mandatory) | json body | ExternalVendorNIF:str esta
+            :param (optional) | json body | ExternalVendorName:str esta
+            :param (mandatory) | json body | AlbaranFecha:str in format YYYY-MM-ddThh:mm:ss esta
+            :param (mandatory) | json body | AlbaranFechaRecepcion:str in format YYYY-MM-ddThh:mm:ss esta
+            :param (mandatory) | json body | Albaranes:str esta
+                                                IsSeparator:bool (mandatory) esta
+                                                IsTextNote:bool (mandatory) esta
+                                                ProductId:str esta
+                                                ProductDescription:str (mandatory) esta
+                                                ProductVariante:str NO ESTA
+                                                Lote:str NO ESTA
+                                                ProductoCantidad:float (mandatory) esta
+                                                ProductoCantidadEntregada:float (optional) esta
+                                                ProductoUoM:str esta
+                                                ProductoPrecio:float esta
+                                                Descuento:float esta
+                                                AlbaranExternoId:str NO ESTA
+                                                AlbaranExternoLinea:str NO ESTA
+                                                PedidoExternoId:str NO ESTA
+                                                PedidoExternoLinea:str NO ESTA
+        """
+        _logger.info(f"rest_api_agatex_purchase | /api/v1/k/purchase/create | Begin")
+        _logger.info(f"rest_api_agatex_purchase | /api/v1/k/purchase/create | Request params: {request.params}")
+        _logger.info(f"rest_api_agatex_purchase | /api/v1/k/purchase/create | Request params raw: {request.httprequest.data}")
+
+        token_valid = validate_request_token(request)
+        if not token_valid:
+            response = prepare_response(errors=[f"Invalid request token"])
+            return response
+            
+        post_data, deserialize_errors = deserialize_request_params_json(request)
+        if deserialize_errors and not post_data:
+            response = prepare_response(errors=deserialize_errors)
+            return response
+
+        validation = self._validate_input__create_purchase_order(post_data)
+        if validation.get("errors"):
+            response = prepare_response(errors=validation.get("errors"))
+            _logger.info(f"rest_api_agatex_purchase | /api/v1/k/purchase/create | END | Errors: {validation.get('errors')}")
+            return response
+        
+        header = {
+            "CompanyId": post_data.get("CompanyId"),
+            "Id": post_data.get("Id"),
+            "ExternalId": post_data.get("ExternalId"),
+            "ExternalVendorId": post_data.get("ExternalVendorId"),
+            "ExternalVendorNIF": post_data.get("ExternalVendorNIF"),
+            "ExternalVendorName": post_data.get("ExternalVendorName"),
+            "AlbaranFecha": post_data.get("AlbaranFecha"),
+            "AlbaranFechaRecepcion": post_data.get("AlbaranFechaRecepcion"),
+            "Albaranes": post_data.get("Albaranes")
+        }
+        lines = post_data.get("lineas")
+        new_order = self._create_purchase_order(header, lines)
+
+        #new_order.action_confirm()
+        #invoices = new_order._create_invoices(final=True)
+
+        response = prepare_response(data=new_order.name)
+        _logger.info(f"rest_api_agatex_sale | /api/v1/k/sale/create | END | Response: {response}")
+        return response
+    
+    # funcion que valida la entrada de los datos minimos necesarios para generar la orden de compra
+    def _validate_input__create_purchase_order(self, post_data):
+        """ return validation object
+            {
+                "errors": []
+            }
+            Checks:
+            - mandatory fields not empty
+            - partner exist
+            - shipping id same as/child of partner
+        """
+        # required fields
+        if not post_data.get("CompanyId") \
+            or not post_data.get("ExternalVendorId") \
+            or not post_data.get("ExternalVendorNIF") \
+            or not post_data.get("ExternalVendorName") \
+            or post_data.get("lineas") is None:
+            return {"errors": [f"Missing some required field: CompanyId, ExternalVendorId, ExternalVendorNIF, ExternalVendorName, lineas"]}
+        
+        lines = post_data.get("lineas")
+        
+        if lines and any(
+            not l.get("ProductoDescripcion") or \
+            (not l.get("IsSeparator") and not l.get("IsTextNote") and not l.get("ProductoId")) for l in lines):
+            return {"errors": [f"Required fields in sale lines: IsSeparator/IsTextNote/ProductoId, ProductoDescripcion"]}
+        
+        # existing partner
+        partner_model = request.env["res.partner"]
+        vat = post_data.get("ExternalVendorNIF")
+        name = post_data.get("ExternalVendorName")
+        company_id = post_data.get("CompanyId")
+        domain = ["|", ("vat", "=", vat), ("name", "=", name)]
+        partner = search_records(partner_model, domain, limit=1, company=company_id)
+
+        if not partner:
+            return {"errors": [f"Partner not found with vat {vat} or name {name} in company with id {company_id}"]}
+
+        # existing incoterm
+        # incoterm_model = request.env["account.incoterms"]
+        # code = post_data.get("Incoterm")
+        # domain = []
+        # incoterm = search_records(incoterm_model, domain).filtered(lambda i: i.code == code)
+        
+        # if not incoterm:
+        #    return {"errors": [f"Incoterm not found with code {code}"]}
+
+        # existing products
+        product_lines = list(filter(lambda l: l.get("ProductoId"), lines))
+        product_model = request.env["product.template"]
+        product_refs = list(set(map(lambda l: l["ProductoId"], product_lines)))
+
+        product_errors = []
+        for r in product_refs:
+            domain = [("default_code", "=", r)]
+            product = search_records(product_model, domain, limit=1, company=company_id)
+            if not product: product_errors.append(f"Product with ref {r} not found")
+        if product_errors:
+            return {"errors": product_errors}              
+        
+        return {"errors": []}
+
+    #Como dice el nombr, funcion para buscar la unidad de medida
+    def find_uom_id(self, uom_name, company_id):
+        uom_model = request.env['uom.uom']
+        domain = [('name', '=', uom_name)]
+        uom = uom_model.sudo().search(domain, limit=1)
+        return uom.id if uom else None
+    # funcion que recive datos, y se encarga de crear la orden de compra
+    def _create_purchase_order(self, header, lines):
+        purchase_order_model = request.env["purchase.order"]
+        partner_model = request.env["res.partner"]
+        product_tmpl_model = request.env["product.template"]
+    
+        vat = header.get("ExternalVendorNIF")
+        name = header.get("ExternalVendorName")
+        company_id = header.get("CompanyId")
+        domain = ["|", ("vat", "=", vat), ("name", "=", name)]
+        partner = search_records(partner_model, domain, limit=1, company=company_id)
+            
+        # header info
+        data = {
+            "partner_id": partner.id,
+            # "partner_shipping_id": header.get("partner_shipping_id"),
+            # "client_order_ref": header.get("client_order_ref")
+            "state": "purchase",
+            "origin": f"Albaranes: {header.get('Albaranes')}",
+            "x_studio_nallbaran": header.get('ExternalId')
+        }
+        _logger.info(f"| END | data: {data}")
+        date_format = "%Y-%m-%d %H:%M:%S"
+        data["date_order"] = datetime.now()
+        data["date_approve"] = datetime.strptime(header.get("AlbaranFecha"), date_format) if header.get("AlbaranFecha") else datetime.now()
+        data["date_planned"] = datetime.strptime(header.get("AlbaranFechaRecepcion"), date_format) if header.get("AlbaranFechaRecepcion") else datetime.now()
+            #data["payment_mode_id"] = (partner.customer_payment_mode_id and partner.customer_payment_mode_id.id) or False
+            #data["payment_term_id"] = (partner.property_payment_term_id and partner.property_payment_term_id.id) or False
+            #data["pricelist_id"] = partner.property_product_pricelist and partner.property_product_pricelist.id or False
+    
+    
+        # lines info
+        if lines:
+            line_data = []
+            for line in lines:
+    
+                product_tmpl = False
+                if line.get("ProductoId"):
+                    domain = [("default_code", "=", line.get("ProductoId"))]
+                    product_tmpl = search_records(product_tmpl_model, domain, limit=1, company=company_id)
+                    
+                tmp_line = {
+                    "name": line.get("ProductoDescripcion")
+                }
+                if product_tmpl:
+                    #tmp_line["product_template_id"] = product_tmpl.id
+                    tmp_line["product_id"] = product_tmpl.product_variant_id.id
+                    tmp_line["product_qty"] = line.get("ProductoCantidad")
+                    tmp_line["qty_received"] = line.get("ProductoCantidadEntregada")
+                #if line.get("ProductoCantidadEntregada"):
+                    #tmp_line["qty_delivered"] = line.get("ProductoCantidadEntregada") or False
+    
+                if line.get("IsSeparator"):
+                    if tmp_line.get("product_id"): del tmp_line["product_id"]
+                    tmp_line["display_type"] = "line_section"
+                    
+                if line.get("IsTextNote"):
+                    if tmp_line.get("product_id"): del tmp_line["product_id"]
+                    tmp_line["display_type"] = "line_note"
+                    
+                if line.get("ProductoPrecio"):
+                    tmp_line["price_unit"] = line.get("ProductoPrecio") or 1.0
+                    
+                if line.get("Descuento"):
+                    tmp_line["discount"] = line.get("Descuento") or False
+                    
+                if line.get("Lote"):
+                    tmp_line["lote"] = line.get("Lote") or False
+                    
+                if line.get("ProductVariante"):
+                    tmp_line["color"] = line.get("ProductVariante") or False        
+                        
+                line_data.append(Command.create(tmp_line))
+                    
+                uom_name = line.get("ProductoUoM")  
+                uom_id = self.find_uom_id(uom_name, company_id) 
+                if uom_id:
+                    tmp_line["product_uom"] = uom_id
+                else:
+                    # Manejar el caso en que no se encuentra la UoM
+                    tmp_line["product_uom"] = False
+                    _logger.error(f"No se encontró la UoM para {uom_name}")
+    
+                data["order_line"] = line_data 
+            
+            new_record = create_record(purchase_order_model, data, company=company_id)
+            new_record.message_post(body=f"Creado desde API")
+            return new_record

@@ -17,7 +17,7 @@
     # Check https://github.com/odoo/odoo/blob/14.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     "category": "Services/Project",
-    "version": "16.0.1.0.16",
+    "version": "16.0.1.0.17",
 
     # any module necessary for this one to work correctly
     "depends": ["sale", "purchase", "stock", "account"],
@@ -26,5 +26,6 @@
     "data": [
         "views/account_move.xml",
         "views/sale_order.xml",
+        "views/extra_fields_view.xml"
     ],
 }
