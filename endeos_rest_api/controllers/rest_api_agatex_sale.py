@@ -583,7 +583,7 @@ class EndeosRestApiResPartner(http.Controller):
                 if product_tmpl:
                     #tmp_line["product_template_id"] = product_tmpl.id
                     tmp_line["product_id"] = product_tmpl.product_variant_id.id
-                    tmp_line["product_qty"] = line.get("ProductoCantidad") or 0.0
+                    
                 #if line.get("ProductoCantidadEntregada"):
                     #tmp_line["qty_delivered"] = line.get("ProductoCantidadEntregada") or False
     
@@ -609,6 +609,8 @@ class EndeosRestApiResPartner(http.Controller):
                 
                 if line.get("qty_received"):
                     tmp_line["qty_received"] = line.get("ProductoCantidadEntregada")   
+                
+                tmp_line["product_qty"] = line.get("ProductoCantidad") or 0.0
                 
                 line_data.append(Command.create(tmp_line))
                     
