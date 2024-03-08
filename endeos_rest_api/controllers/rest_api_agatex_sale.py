@@ -416,15 +416,15 @@ class EndeosRestApiResPartner(http.Controller):
                                                 IsTextNote:bool (mandatory) esta
                                                 ProductId:str esta
                                                 ProductDescription:str (mandatory) esta
-                                                ProductVariante:str NO ESTA
-                                                Lote:str NO ESTA
+                                                ProductVariante:str ESTA
+                                                Lote:str ESTA
                                                 ProductoCantidad:float (mandatory) esta
                                                 ProductoCantidadEntregada:float (optional) esta
                                                 ProductoUoM:str esta
                                                 ProductoPrecio:float esta
                                                 Descuento:float esta
-                                                AlbaranExternoId:str NO ESTA
-                                                AlbaranExternoLinea:str NO ESTA
+                                                AlbaranExternoId:str No ESTA
+                                                AlbaranExternoLinea:str No ESTA
                                                 PedidoExternoId:str NO ESTA
                                                 PedidoExternoLinea:str NO ESTA
         """
