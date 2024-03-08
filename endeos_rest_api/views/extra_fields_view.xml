@@ -7,4 +7,5 @@
             <field name="arch" type="xml">
                 
             </field>
+    </record>
 </odoo>
