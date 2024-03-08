@@ -26,6 +26,6 @@
     "data": [
         "views/account_move.xml",
         "views/sale_order.xml",
-        "views/extra_fields_view.xml"
+        #"views/extra_fields_view.xml"
     ],
 }
