@@ -155,11 +155,8 @@ class EndeosRestApiResPartner(http.Controller):
         or not post_data.get("ExternalCustomerNIF") \
         or not post_data.get("ExternalCustomerName") \
         or not post_data.get("FacturaFecha") \
-        or not post_data.get("Incoterm") \
-        or not post_data.get("IncotermUbicacion") \
-        or not post_data.get("IncotrastatTransportCode") \
         or post_data.get("lineas") is None:
-            return {"errors": [f"Missing some required field: CompanyId, ExternalCustomerId, ExternalCustomerNIF, ExternalCustomerName, FacturaFecha, Incoterm, IncotermUbicacion, IncotrastatTransportCode, lineas"]}
+            return {"errors": [f"Missing some required field: CompanyId, ExternalCustomerId, ExternalCustomerNIF, ExternalCustomerName, FacturaFecha, lineas"]}
         
         lines = post_data.get("lineas")
         
@@ -185,8 +182,9 @@ class EndeosRestApiResPartner(http.Controller):
         domain = []
         incoterm = search_records(incoterm_model, domain).filtered(lambda i: i.code == code)
         
-        if not incoterm:
-            return {"errors": [f"Incoterm not found with code {code}"]}
+        if code != "":
+            if not incoterm:
+                return {"errors": [f"Incoterm not found with code {code}"]}
 
         # existing products
         product_lines = list(filter(lambda l: l.get("ProductoId"), lines))
