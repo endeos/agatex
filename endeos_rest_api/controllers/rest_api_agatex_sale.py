@@ -561,7 +561,7 @@ class EndeosRestApiResPartner(http.Controller):
         data["date_order"] = datetime.now()
         data["date_approve"] = datetime.strptime(header.get("AlbaranFecha"), date_format) if header.get("AlbaranFecha") else datetime.now()
         data["date_planned"] = datetime.strptime(header.get("AlbaranFechaRecepcion"), date_format) if header.get("AlbaranFechaRecepcion") else datetime.now()
-        #data["name"] = datetime.strptime(header.get("Id"), date_format) if header.get("Id")
+        data["name"] = header.get("Id") if header.get("Id") else False
             #data["payment_mode_id"] = (partner.customer_payment_mode_id and partner.customer_payment_mode_id.id) or False
             #data["payment_term_id"] = (partner.property_payment_term_id and partner.property_payment_term_id.id) or False
             #data["pricelist_id"] = partner.property_product_pricelist and partner.property_product_pricelist.id or False

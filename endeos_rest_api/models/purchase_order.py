@@ -1,7 +1,4 @@
 from odoo import models, fields, api
-import logging
-
-_logger = logging.getLogger(__name__)
 
 class CustomPurchaseOrder(models.Model):
     _inherit = 'purchase.order'
@@ -19,6 +16,5 @@ class CustomPurchaseOrder(models.Model):
         else:
             # usar el valor por defecto
             pass
-        _logger.warning(f"Valores en customPurchaseOrder {vals}")
         
         return super(CustomPurchaseOrder, self).create(vals)
