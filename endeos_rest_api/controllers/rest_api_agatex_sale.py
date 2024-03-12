@@ -534,6 +534,7 @@ class EndeosRestApiResPartner(http.Controller):
         domain = [('name', '=', uom_name)]
         uom = uom_model.sudo().search(domain, limit=1)
         return uom.id if uom else None
+    
     # funcion que recive datos, y se encarga de crear la orden de compra
     def _create_purchase_order(self, header, lines):
         purchase_order_model = request.env["purchase.order"]
@@ -560,6 +561,7 @@ class EndeosRestApiResPartner(http.Controller):
         data["date_order"] = datetime.now()
         data["date_approve"] = datetime.strptime(header.get("AlbaranFecha"), date_format) if header.get("AlbaranFecha") else datetime.now()
         data["date_planned"] = datetime.strptime(header.get("AlbaranFechaRecepcion"), date_format) if header.get("AlbaranFechaRecepcion") else datetime.now()
+        #data["name"] = datetime.strptime(header.get("Id"), date_format) if header.get("Id")
             #data["payment_mode_id"] = (partner.customer_payment_mode_id and partner.customer_payment_mode_id.id) or False
             #data["payment_term_id"] = (partner.property_payment_term_id and partner.property_payment_term_id.id) or False
             #data["pricelist_id"] = partner.property_product_pricelist and partner.property_product_pricelist.id or False
@@ -619,7 +621,7 @@ class EndeosRestApiResPartner(http.Controller):
                 else:
                     # Manejar el caso en que no se encuentra la UoM
                     tmp_line["product_uom"] = False
-                    _logger.error(f"No se encontró la UoM para {uom_name}")
+                    _logger.warning(f"No se encontró la UoM para {uom_name}")
     
                 data["order_line"] = line_data 
             
