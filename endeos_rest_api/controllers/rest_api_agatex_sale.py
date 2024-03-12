@@ -561,10 +561,12 @@ class EndeosRestApiResPartner(http.Controller):
         data["date_order"] = datetime.now()
         data["date_approve"] = datetime.strptime(header.get("AlbaranFecha"), date_format) if header.get("AlbaranFecha") else datetime.now()
         data["date_planned"] = datetime.strptime(header.get("AlbaranFechaRecepcion"), date_format) if header.get("AlbaranFechaRecepcion") else datetime.now()
-        data["name"] = header.get("Id") if header.get("Id") else False
-            #data["payment_mode_id"] = (partner.customer_payment_mode_id and partner.customer_payment_mode_id.id) or False
-            #data["payment_term_id"] = (partner.property_payment_term_id and partner.property_payment_term_id.id) or False
-            #data["pricelist_id"] = partner.property_product_pricelist and partner.property_product_pricelist.id or False
+        # Recoger el valor de ID y usarlo como ref del pedido si viene en la API, sino usar secuencia de Odoo
+        if header.get("Id") and header.get("Id") != "":
+            data["name"] = header.get("Id") 
+        #data["payment_mode_id"] = (partner.customer_payment_mode_id and partner.customer_payment_mode_id.id) or False
+        #data["payment_term_id"] = (partner.property_payment_term_id and partner.property_payment_term_id.id) or False
+        #data["pricelist_id"] = partner.property_product_pricelist and partner.property_product_pricelist.id or False
     
     
         # lines info
