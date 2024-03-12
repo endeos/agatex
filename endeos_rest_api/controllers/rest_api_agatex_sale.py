@@ -73,11 +73,42 @@ class EndeosRestApiResPartner(http.Controller):
         new_order = self._create_sale_order(header, lines)
 
         new_order.action_confirm()
+        
+        intrastat_country = None
+        # existing partner
+        partner_model = request.env["res.partner"]
+        vat = post_data.get("ExternalCustomerNIF")
+        name = post_data.get("ExternalCustomerName")
+        company_id = post_data.get("CompanyId")
+        domain = ["|", ("vat", "=", vat), ("name", "=", name)]
+        partner = search_records(partner_model, domain, limit=1, company=company_id)
+        intrastat_code = post_data.get("IncotrastatTransportCode")
+        
+        if not partner:
+            return {"errors": [f"Partner not found with vat {vat} or name {name} in company with id {company_id}"]}
+        if partner.country_id.code != "ES":
+            intrastat_country = partner.country_id.id
+        # buscar metodo transporte
+        transport_model = request.env["account.intrastat.code"]
+        domain_intrastat = [("code", "=", intrastat_code)]
+        intrastat = search_records(transport_model, domain_intrastat, limit=1)
         invoices = new_order._create_invoices(final=True)
-        invoices.write({
-            "x_sale_incoterm_location": new_order.incoterm_location,
-            "x_sale_incotrastat_transport_code": new_order.x_incotrastat_transport_code
-        })
+        if intrastat_country:
+            invoices.write({
+                "x_sale_incoterm_location": new_order.incoterm_location,
+                "x_sale_incotrastat_transport_code": new_order.x_incotrastat_transport_code,
+                "intrastat_country_id": intrastat_country,
+                "intrastat_transport_mode_id": intrastat.id,
+            })
+        else:
+            invoices.write({
+                "x_sale_incoterm_location": new_order.incoterm_location,
+                "x_sale_incotrastat_transport_code": new_order.x_incotrastat_transport_code
+            })
+        # invoices.write({
+        #     "x_sale_incoterm_location": new_order.incoterm_location,
+        #     "x_sale_incotrastat_transport_code": new_order.x_incotrastat_transport_code
+        # })
 
         response = prepare_response(data=new_order.name)
         _logger.info(f"rest_api_agatex_sale | /api/v1/k/sale/create | END | Response: {response}")
