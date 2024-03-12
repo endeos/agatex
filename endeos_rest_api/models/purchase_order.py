@@ -19,6 +19,6 @@ class CustomPurchaseOrder(models.Model):
         else:
             # usar el valor por defecto
             pass
-        _logger.warning(f"No se encontró la UoM para {vals}")
+        _logger.warning(f"Valores en customPurchaseOrder {vals}")
         
         return super(CustomPurchaseOrder, self).create(vals)
