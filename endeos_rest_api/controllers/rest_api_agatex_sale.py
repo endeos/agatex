@@ -560,10 +560,14 @@ class EndeosRestApiResPartner(http.Controller):
         return {"errors": []}
 
     #Como dice el nombr, funcion para buscar la unidad de medida
-    def find_uom_id(self, uom_name, company_id):
+    def find_uom_id(self, uom_name, product_id):
         uom_model = request.env['uom.uom']
         domain = [('name', '=', uom_name)]
         uom = uom_model.sudo().search(domain, limit=1)
+        if not uom:
+            product_model = request.env['product.product']
+            product = product_model.sudo().browse(product_id)
+            uom = product.uom_id
         return uom.id if uom else None
     
     # funcion que recive datos, y se encarga de crear la orden de compra
@@ -604,12 +608,12 @@ class EndeosRestApiResPartner(http.Controller):
         if lines:
             line_data = []
             for line in lines:
-    
+                id_prod = None
                 product_tmpl = False
                 if line.get("ProductoId"):
                     domain = [("default_code", "=", line.get("ProductoId"))]
                     product_tmpl = search_records(product_tmpl_model, domain, limit=1, company=company_id)
-                    
+                    id_prod = product_tmpl.product_variant_id.id
                 tmp_line = {
                     "name": line.get("ProductoDescripcion")
                 }
@@ -645,17 +649,16 @@ class EndeosRestApiResPartner(http.Controller):
                 
                 tmp_line["product_qty"] = line.get("ProductoCantidad") or 0.0
                 
-                line_data.append(Command.create(tmp_line))
-                    
+                #Conseguir uom, comparando con el dato recibido, sino usar el del producto recibido
                 uom_name = line.get("ProductoUoM")  
-                uom_id = self.find_uom_id(uom_name, company_id) 
+                uom_id = self.find_uom_id(uom_name, id_prod)
                 if uom_id:
                     tmp_line["product_uom"] = uom_id
                 else:
                     # Manejar el caso en que no se encuentra la UoM
-                    tmp_line["product_uom"] = False
                     _logger.warning(f"No se encontró la UoM para {uom_name}")
     
+                line_data.append(Command.create(tmp_line))
                 data["order_line"] = line_data 
             
             new_record = create_record(purchase_order_model, data, company=company_id)
