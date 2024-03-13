@@ -90,7 +90,7 @@ class EndeosRestApiResPartner(http.Controller):
             intrastat_country = partner.country_id.id
         # buscar metodo transporte
         transport_model = request.env["account.intrastat.code"]
-        domain_intrastat = [("code", "=", intrastat_code)]
+        domain_intrastat = ["&", ("code", "=", intrastat_code), ("type", "=", "transport")]
         intrastat = search_records(transport_model, domain_intrastat, limit=1)
         invoices = new_order._create_invoices(final=True)
         if intrastat_country:
