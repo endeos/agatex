@@ -13,9 +13,7 @@
                 <field name="x_sale_incotrastat_transport_code" />
             </xpath>
             <xpath expr="//field[@name='quantity']" position="before">
-                <t t-if="record.product_id.intrastat_code_id and record.partner_id.country_id.id != 68">
-                    <field name="x_sale_line_merc_code"/>
-                </t>
+                <field name="x_sale_line_merc_code"/>
             </xpath>
         </field>
     </record>
