@@ -93,6 +93,16 @@ class EndeosRestApiResPartner(http.Controller):
         domain_intrastat = ["&", ("code", "=", intrastat_code), ("type", "=", "transport")]
         intrastat = search_records(transport_model, domain_intrastat, limit=1)
         invoices = new_order._create_invoices(final=True)
+        
+        product_tmpl_model = request.env["product.template"]
+        product_tmpl_aux = False
+        for line in lines:
+            product_tmpl = False
+            if line.get("ProductoId"):
+                domain = [("default_code", "=", line.get("ProductoId"))]
+                product_tmpl = search_records(product_tmpl_model, domain, limit=1, company=company_id)
+                if product_tmpl:
+                    product_tmpl_aux = product_tmpl
         if intrastat_country:
             invoices.write({
                 "x_sale_incoterm_location": new_order.incoterm_location,
@@ -105,6 +115,12 @@ class EndeosRestApiResPartner(http.Controller):
                 "x_sale_incoterm_location": new_order.incoterm_location,
                 "x_sale_incotrastat_transport_code": new_order.x_incotrastat_transport_code
             })
+        
+        for line in invoices.invoice_line_ids:
+            if product_tmpl_aux:
+                line.write({
+                    'x_sale_line_merc_code': product_tmpl_aux.intrastat_code_id.code
+                })
         # invoices.write({
         #     "x_sale_incoterm_location": new_order.incoterm_location,
         #     "x_sale_incotrastat_transport_code": new_order.x_incotrastat_transport_code
