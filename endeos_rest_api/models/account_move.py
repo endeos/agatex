@@ -9,9 +9,6 @@ class AccountMove(models.Model):
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
 
-    x_sale_line_merc_code = fields.Many2one(
-        'product.product',
-        string='Código de Mercancia',
-        related='product_id.intrastat_code_id',
-        readonly=True
-    )
+    x_sale_line_merc_code = fields.Char(
+        string="Código de mercancia", 
+        help="Valor recogido del producto asociado si se ha creado a través de la API")
