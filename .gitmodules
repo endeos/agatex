@@ -98,3 +98,7 @@
 	path = OCA/account-reconcile
 	url = https://github.com/OCA/account-reconcile
 	branch = 16.0
+[submodule "OCA/intrastat-extrastat"]
+	path = OCA/intrastat-extrastat
+	url = https://github.com/OCA/intrastat-extrastat
+	branch = 16.0
