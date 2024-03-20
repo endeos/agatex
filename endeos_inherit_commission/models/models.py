@@ -6,7 +6,7 @@ class SaleOrderLineAgent(models.Model):
 
     # Nuevo campo para seleccionar una comisión entre todas las disponibles
     all_commission_id = fields.Many2one(
-        'sale.commission', 
+        'commission', 
         string="All Commissions"
     )
 
