@@ -18,15 +18,9 @@ class CommissionSettleLine(models.Model):
     
 class SaleOrderLineAgent(models.Model):
     _inherit = "sale.order.line.agent"
-
-    commission_ids = fields.Many2many(
-        comodel_name="commission",
-        string="Commissions",
-        copy=True
-    )
     
     @api.depends(
-        "commission_id",
+        "commission_ids",
         "object_id.price_subtotal",
         "object_id.product_id",
         "object_id.product_uom_qty",
@@ -35,8 +29,22 @@ class SaleOrderLineAgent(models.Model):
         for line in self:
             order_line = line.object_id
             line.amount = line._get_commission_amount(
-                line.commission_id,
+                line.commission_ids,
                 order_line.price_subtotal,
                 order_line.product_id,
                 order_line.product_uom_qty,
             )
+            
+class CommissionLineMixin(models.AbstractModel):
+    _inherit = "commission.line.mixin"
+
+    commission_ids = fields.Many2many(
+            comodel_name="commission",
+            string="Commissions",
+            compute="_compute_commission_id",
+            copy=True
+        )
+    @api.depends("agent_id")
+    def _compute_commission_id(self):
+        for record in self:
+            record.commission_ids = record.agent_id.commission_id
