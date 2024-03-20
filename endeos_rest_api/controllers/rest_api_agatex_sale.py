@@ -14,6 +14,7 @@ class EndeosRestApiResPartner(http.Controller):
         """ return sale order name just created
             :param (mandatory) | json body | CompanyId:int
             :param (mandatory) | json body | ExternalId:str
+            :param (optional) | json body | SourceDocumentNo:str
             :param (mandatory) | json body | ExternalCustomerId:str
             :param (mandatory) | json body | ExternalCustomerNIF:str
             :param (optional) | json body | ExternalCustomerName:str
@@ -67,7 +68,8 @@ class EndeosRestApiResPartner(http.Controller):
             "Incoterm": post_data.get("Incoterm"),
             "IncotermUbicacion": post_data.get("IncotermUbicacion"),
             "IncotrastatTransportCode": post_data.get("IncotrastatTransportCode"),
-            "Albaranes": post_data.get("Albaranes")
+            "Albaranes": post_data.get("Albaranes"),
+            "SourceDocumentNo": post_data.get("SourceDocumentNo"),
         }
         lines = post_data.get("lineas")
         new_order = self._create_sale_order(header, lines)
@@ -121,10 +123,10 @@ class EndeosRestApiResPartner(http.Controller):
                 line.write({
                     'x_sale_line_merc_code': product_tmpl_aux.intrastat_code_id.code
                 })
-        # invoices.write({
-        #     "x_sale_incoterm_location": new_order.incoterm_location,
-        #     "x_sale_incotrastat_transport_code": new_order.x_incotrastat_transport_code
-        # })
+        invoices.write({
+            "x_sale_incoterm_location": new_order.incoterm_location,
+            "x_sale_incotrastat_transport_code": new_order.x_incotrastat_transport_code
+        })
 
         response = prepare_response(data=new_order.name)
         _logger.info(f"rest_api_agatex_sale | /api/v1/k/sale/create | END | Response: {response}")
@@ -333,7 +335,8 @@ class EndeosRestApiResPartner(http.Controller):
             "incoterm": incoterm.id,
             "incoterm_location": header.get("IncotermUbicacion"),
             "origin": header.get('Albaranes'),
-            "x_incotrastat_transport_code": header.get("IncotrastatTransportCode")
+            "x_incotrastat_transport_code": header.get("IncotrastatTransportCode"),
+            "origin": header.get('SourceDocumentNo'),
         }
 
         date_format = "%Y-%m-%d %H:%M:%S"
@@ -451,6 +454,7 @@ class EndeosRestApiResPartner(http.Controller):
             :param (mandatory) | json body | CompanyId:int esta
             :param (mandatory) | json body | Id:str esta
             :param (mandatory) | json body | ExternalId:str esta
+            :param (optional) | json body | SourceDocumentNo:str esta
             :param (mandatory) | json body | ExternalVendorrId:str esta
             :param (mandatory) | json body | ExternalVendorNIF:str esta
             :param (optional) | json body | ExternalVendorName:str esta
@@ -502,7 +506,8 @@ class EndeosRestApiResPartner(http.Controller):
             "ExternalVendorName": post_data.get("ExternalVendorName"),
             "AlbaranFecha": post_data.get("AlbaranFecha"),
             "AlbaranFechaRecepcion": post_data.get("AlbaranFechaRecepcion"),
-            "Albaranes": post_data.get("Albaranes")
+            "Albaranes": post_data.get("Albaranes"),
+            "SourceDocumentNo": post_data.get("SourceDocumentNo"),
         }
         lines = post_data.get("lineas")
         new_order = self._create_purchase_order(header, lines)
@@ -604,7 +609,7 @@ class EndeosRestApiResPartner(http.Controller):
             # "partner_shipping_id": header.get("partner_shipping_id"),
             # "client_order_ref": header.get("client_order_ref")
             "state": "purchase",
-            "origin": f"Albaranes: {header.get('Albaranes')}",
+            "origin": header.get('SourceDocumentNo'),
             "x_n_albaran": header.get('ExternalId')
         }
         _logger.info(f"| END | data: {data}")
