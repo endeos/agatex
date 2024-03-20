@@ -19,9 +19,14 @@ class CommissionSettleLine(models.Model):
 class SaleOrderLineAgent(models.Model):
     _inherit = "sale.order.line.agent"
 
+    commission_ids = fields.Many2many(
+        comodel_name="commission",
+        string="Commissions",
+        copy=True
+    )
+    
     @api.depends(
         "commission_id",
-        "commission_ids",
         "object_id.price_subtotal",
         "object_id.product_id",
         "object_id.product_uom_qty",
