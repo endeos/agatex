@@ -26,4 +26,12 @@ class SaleOrderLineAgent(models.Model):
                 order_line.product_id,
                 order_line.product_uom_qty,
             )
-            
+
+class SaleOrderLineAgent(models.Model):
+    _inherit = "commission.line.mixin"
+    
+    @api.onchange('all_commission_id')
+    def _onchange_all_commission_id(self):
+        for record in self:
+            record.commission_id = record.all_commission_id
+    
