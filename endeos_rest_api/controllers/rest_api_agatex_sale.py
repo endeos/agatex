@@ -33,6 +33,7 @@ class EndeosRestApiResPartner(http.Controller):
                                                 ProductoUoM:str
                                                 ProductoPrecio:float
                                                 Descuento:float
+                                                Agente:str
                                                 AlbaranExternoId:str
                                                 AlbaranExternoLinea:str
                                                 PedidoExternoId:str
@@ -381,6 +382,16 @@ class EndeosRestApiResPartner(http.Controller):
                 
                 if line.get("Descuento"):
                     tmp_line["discount"] = line.get("Descuento")
+                
+                agente = False
+                if line.get("Agente"):
+                    domain = [("vat", "=", line.get("Agente"))]
+                    agent_model = "res.partner"
+                    agente = search_records(agent_model, domain, limit=1, company=company_id)
+                    _logger.info(f"| Agente | data2: {agente}")
+                    if agente: 
+                        tmp_line["agent_id"] = agente.id
+                        _logger.info(f"| Agente | data: {agente.id}")
 
                 line_data.append(Command.create(tmp_line))
 
