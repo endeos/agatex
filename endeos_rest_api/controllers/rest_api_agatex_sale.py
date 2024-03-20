@@ -386,12 +386,12 @@ class EndeosRestApiResPartner(http.Controller):
                 agente = False
                 if line.get("Agente"):
                     domain = [("vat", "=", line.get("Agente"))]
-                    agent_model = "res.partner"
+                    agent_model = request.env["res.partner"]
                     agente = search_records(agent_model, domain, limit=1, company=company_id)
-                    _logger.info(f"| Agente | data2: {agente}")
-                    if agente: 
-                        tmp_line["agent_id"] = agente.id
-                        _logger.info(f"| Agente | data: {agente.id}")
+                    if agente:
+                        sale_order_line_agent = request.env['sale.order.line.agent'].search([('display_name', '=', agente.display_name)], limit=1)
+                        if sale_order_line_agent:
+                            tmp_line["agent_ids"] = [(4, sale_order_line_agent.id)]
 
                 line_data.append(Command.create(tmp_line))
 
