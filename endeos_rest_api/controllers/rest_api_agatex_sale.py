@@ -384,22 +384,34 @@ class EndeosRestApiResPartner(http.Controller):
                 if line.get("Descuento"):
                     tmp_line["discount"] = line.get("Descuento")
                 
-                agente = False
-                if line.get("Agente"):
-                    domain = [("vat", "=", line.get("Agente"))]
-                    agent_model = request.env["res.partner"]
-                    agente = search_records(agent_model, domain, limit=1, company=company_id)
-                    if agente:
-                        sale_order_line_agent = request.env['sale.order.line.agent'].search([('display_name', '=', agente.display_name)], limit=1)
-                        if sale_order_line_agent:
-                            tmp_line["agent_ids"] = [(4, sale_order_line_agent.id)]
-                            
-
-                line_data.append(Command.create(tmp_line))
+                line_data.append(Command.create(tmp_line))                
 
             data["order_line"] = line_data 
 
         new_record = create_record(sale_order_model, data, company=company_id)
+       for line in lines:
+            for order_line in new_record.order_line:
+                if line.get("Agente"):
+                    domain = [("vat", "=", line.get("Agente"))]
+                    agent_model = request.env["res.partner"]
+                    agente = search_records(agent_model, domain, limit=1, company=company_id)
+                    if line.get("CodigoComision"):
+                        domain = [("name", "=", line.get("CodigoComision"))]
+                        commission_model = request.env["commission"]
+                        commission = search_records(commission_model, domain, limit=1, company=company_id)
+                        new_agent_link = request.env['sale.order.line.agent'].create({
+                            'agent_id': agente.id,
+                            'object_id': order_line.id,
+                            'commission_id': commission.id
+                        })
+                    else:
+                        new_agent_link = request.env['sale.order.line.agent'].create({
+                            'agent_id': agente.id,
+                            'object_id': order_line.id,
+                            'commission_id': 4,
+                        })
+                        
+                    order_line.agent_ids = [(4, new_agent_link.id)] 
         new_record.message_post(body=f"Creado desde API")
         return new_record
 
