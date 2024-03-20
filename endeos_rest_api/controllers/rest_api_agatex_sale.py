@@ -34,6 +34,7 @@ class EndeosRestApiResPartner(http.Controller):
                                                 ProductoPrecio:float
                                                 Descuento:float
                                                 Agente:str
+                                                CodigoComision:str
                                                 AlbaranExternoId:str
                                                 AlbaranExternoLinea:str
                                                 PedidoExternoId:str
@@ -392,6 +393,7 @@ class EndeosRestApiResPartner(http.Controller):
                         sale_order_line_agent = request.env['sale.order.line.agent'].search([('display_name', '=', agente.display_name)], limit=1)
                         if sale_order_line_agent:
                             tmp_line["agent_ids"] = [(4, sale_order_line_agent.id)]
+                            
 
                 line_data.append(Command.create(tmp_line))
 
