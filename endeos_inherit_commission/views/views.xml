@@ -3,7 +3,7 @@
         <record id="view_sale_order_line_agent_tree_inherit" model="ir.ui.view">
             <field name="name">sale.order.line.agent.tree.inherit</field>
             <field name="model">sale.order.line.agent</field>
-            <field name="inherit_id" ref="module_original.view_sale_order_line_tree"/>
+            <field name="inherit_id" ref="sale_commission.view_sale_order_line_tree"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='commission_id']" position="replace">
                     <field name="commission_ids"
