@@ -9,7 +9,7 @@
         <field name="arch" type="xml">
             
             <xpath expr="//notebook//page[@name='other_information']//group[@name='sale_shipping']" position="inside">
-                <field name="x_incotrastat_transport_code" />
+                <field name="x_incotrastat_transport_code" invisible="1"/>
             </xpath>
         </field>
     </record>

@@ -10,7 +10,7 @@
             
             <xpath expr="//notebook//page[@name='other_info']//group[@name='sale_info_group']" position="inside">
                 <field name="x_sale_incoterm_location" />
-                <field name="x_sale_incotrastat_transport_code" />
+                <field name="x_sale_incotrastat_transport_code" invisible="1"/>
             </xpath>
             <xpath expr="//field[@name='quantity']" position="before">
                 <field name="x_sale_line_merc_code"/>
