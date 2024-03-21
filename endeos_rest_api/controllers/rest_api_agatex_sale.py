@@ -202,12 +202,11 @@ class EndeosRestApiResPartner(http.Controller):
         """
         # required fields
         if not post_data.get("CompanyId") \
-        or not post_data.get("ExternalCustomerId") \
         or not post_data.get("ExternalCustomerNIF") \
         or not post_data.get("ExternalCustomerName") \
-        or not post_data.get("FacturaFecha") \
+        or not post_data.get("Incoterm") \
         or post_data.get("lineas") is None:
-            return {"errors": [f"Missing some required field: CompanyId, ExternalCustomerId, ExternalCustomerNIF, ExternalCustomerName, FacturaFecha, lineas"]}
+            return {"errors": [f"Missing some required field: CompanyId, ExternalCustomerNIF, ExternalCustomerName, Incoterm, lineas"]}
         
         lines = post_data.get("lineas")
         
@@ -556,11 +555,10 @@ class EndeosRestApiResPartner(http.Controller):
         """
         # required fields
         if not post_data.get("CompanyId") \
-            or not post_data.get("ExternalVendorId") \
             or not post_data.get("ExternalVendorNIF") \
             or not post_data.get("ExternalVendorName") \
             or post_data.get("lineas") is None:
-            return {"errors": [f"Missing some required field: CompanyId, ExternalVendorId, ExternalVendorNIF, ExternalVendorName, lineas"]}
+            return {"errors": [f"Missing some required field: CompanyId, ExternalVendorNIF, ExternalVendorName, lineas"]}
         
         lines = post_data.get("lineas")
         
